@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/v1/employee")
 public class EmployeeController {
@@ -19,21 +19,24 @@ public class EmployeeController {
     @Autowired
     EmployeeService employeeService;
 
+//    Admin
     @GetMapping
     public ResponseEntity<?>getAllEmployee(){
         return employeeService.getEmployee();
     }
 
+//    Admin
     @GetMapping("/list")
     public ResponseEntity<?> getEmployees(){
         return employeeService.getEmployeeActive();
     }
-
+// Admin
     @GetMapping("/generateId")
     public ResponseEntity<?> getIdempployee(){
         return ResponseEntity.ok().body(new ResponeObject(HttpStatus.OK.value(), "Generate id success",employeeService.generateEmployeeId()));
     }
 
+//    Admin and User
     @GetMapping("/{idemployee}")
     public ResponseEntity<?> getIDEmployee(@PathVariable String idemployee){
         return employeeService.getIDEmployee(idemployee);
@@ -44,26 +47,32 @@ public class EmployeeController {
         return employeeService.getDetailSalary(idemployee);
     }
 
+//    Admin
     @GetMapping("/amount")
     public ResponseEntity<?> getAmountEmployee(){
         return employeeService.countEmployee();
     }
+
+//    Admin
     @PostMapping
     @Transactional
     public ResponseEntity<?> addEmployee(@RequestBody EmployeeDTO e){
         return employeeService.addEmployee(e);
     }
 
+//    Admin and user
     @PutMapping("{idemployee}")
     public ResponseEntity<?>updateEmployee(@PathVariable String idemployee, @RequestBody EmployeeDTO e){
         return employeeService.updateEmployee(idemployee,e);
     }
 
+//    Admin
     @PutMapping("/{idemployee}/changeStatus")
     public ResponseEntity<?>updateStatusEmployee(@PathVariable String idemployee){
         return employeeService.updateStatusEmployee(idemployee);
     }
 
+//    Admin
     @DeleteMapping("{id}")
     public  ResponseEntity<?>deleteEmployee(@PathVariable String id){
         return  employeeService.deleteEmployee(id);
