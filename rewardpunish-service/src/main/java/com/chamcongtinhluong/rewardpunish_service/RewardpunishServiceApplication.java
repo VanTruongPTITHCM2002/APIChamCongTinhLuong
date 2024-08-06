@@ -1,0 +1,15 @@
+package com.chamcongtinhluong.rewardpunish_service;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+
+@SpringBootApplication
+@EnableFeignClients
+public class RewardpunishServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(RewardpunishServiceApplication.class, args);
+	}
+
+}
