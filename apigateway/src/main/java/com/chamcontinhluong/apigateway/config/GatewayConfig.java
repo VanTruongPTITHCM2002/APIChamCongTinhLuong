@@ -148,6 +148,25 @@ public class GatewayConfig {
                         .filters(f->f.filter(JwtAdminAuthenticationFilter
                                 .builder().checkpath("/api/v1/workscheduledetail/**").build()))
                         .uri("http://localhost:8084"))
+
+                .route("payroll-service-admin",r->r.path("/api/v1/payroll/**")
+                        .and().method(HttpMethod.GET,HttpMethod.PUT,HttpMethod.POST)
+                        .filters(f->f.filter(JwtAdminAuthenticationFilter
+                                .builder().checkpath("/api/v1/payroll/**").
+                                build()))
+                        .uri("http://localhost:8085")
+                )
+                .route("payroll-service",r->r.path("/api/v1/payroll/getidemployee")
+                        .or().path("/api/v1/payroll/totalPayment")
+                        .or().path("/api/v1/payroll/getMonthlyEmployee")
+                        .filters(f->f.filter(JwtAuthenticationFilter
+                                .builder().
+                                adminPaths(Arrays.asList("/api/v1/payroll/getidemployee"
+                                ,"/api/v1/payroll/totalPayment"
+                                ,"/api/v1/payroll/getMonthlyEmployee"))
+                                        .userPaths(List.of("/asda"))
+                                .build()))
+                        .uri("http://localhost:8085"))
                 .build();
     }
 }
