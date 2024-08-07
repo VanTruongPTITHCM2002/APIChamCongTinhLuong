@@ -13,6 +13,8 @@ import java.util.List;
 public interface ContractRepository extends JpaRepository<Contract,Integer> {
 //    Contract findByIdemployeeAndEndateAfterAndStartdateBefore(String idemployee, Date endate, Date startdate);
 
+    List<Contract> findByIdemployee(String idemployee);
+
     Contract findByIdemployeeAndStartdateBeforeAndEndateAfter(
             String idemployee, Date endate, Date startdate);
 

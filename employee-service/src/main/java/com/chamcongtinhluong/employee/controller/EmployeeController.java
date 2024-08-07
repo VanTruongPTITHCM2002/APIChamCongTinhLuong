@@ -73,8 +73,8 @@ public class EmployeeController {
     }
 
 //    Admin
-    @DeleteMapping("{id}")
-    public  ResponseEntity<?>deleteEmployee(@PathVariable String id){
-        return  employeeService.deleteEmployee(id);
+    @DeleteMapping("/{idemployee}")
+    public  ResponseEntity<?>deleteEmployee(@PathVariable String idemployee){
+        return  employeeService.deleteEmployee(idemployee);
     }
 }

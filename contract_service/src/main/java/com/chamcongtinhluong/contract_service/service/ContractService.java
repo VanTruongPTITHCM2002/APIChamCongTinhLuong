@@ -18,4 +18,5 @@ public interface ContractService {
     PayrollContractResponse getBasicSalaryDayWork(PayrollContractRequest payrollContractRequest);
     public void updateContractStatus();
     public int countContracts(int month,int year);
+    Boolean checkIdEmployeeInContract(String idemployee);
 }

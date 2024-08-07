@@ -38,6 +38,12 @@ public class ContractController {
     private int countContractsByMonthAndYear(@RequestParam int month,@RequestParam int year){
         return contractService.countContracts(month, year);
     }
+
+    @GetMapping("/checkemployee/{idemployee}")
+    private Boolean checkEmployee(@PathVariable String idemployee){
+        return contractService.checkIdEmployeeInContract(idemployee);
+    }
+
     @PostMapping("/getcontract")
     private PayrollContractResponse getContractByIdMonthYear(@RequestBody PayrollContractRequest payrollContractRequest){
         return contractService.getBasicSalaryDayWork(payrollContractRequest);

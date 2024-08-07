@@ -75,4 +75,9 @@ public class AuthController {
         return accountService.changStatusAccount(idemployee);
     }
 
+    @DeleteMapping("/account/{username}")
+    public ResponseEntity<?> deleteAccount(@PathVariable String username){
+        return accountService.deleteAccount(username);
+    }
+
 }

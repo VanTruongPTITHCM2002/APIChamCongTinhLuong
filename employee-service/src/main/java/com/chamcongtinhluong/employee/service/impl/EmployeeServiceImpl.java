@@ -3,6 +3,7 @@ package com.chamcongtinhluong.employee.service.impl;
 import com.chamcongtinhluong.employee.Enum.DegreeNumber;
 import com.chamcongtinhluong.employee.Enum.StatusEmployee;
 import com.chamcongtinhluong.employee.communicate.AccountServiceClient;
+import com.chamcongtinhluong.employee.communicate.ContractEmployeeServiceClient;
 import com.chamcongtinhluong.employee.communicate.CreateAccountRequest;
 import com.chamcongtinhluong.employee.dto.EmployeeDTO;
 import com.chamcongtinhluong.employee.dto.response.DetailSalaryResponse;
@@ -37,7 +38,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private AccountServiceClient accountServiceClient;
 
-
+    @Autowired
+    private ContractEmployeeServiceClient contractEmployeeServiceClient;
 
     @Override
     public String generateEmployeeId() {
@@ -199,13 +201,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ResponseEntity<?> deleteEmployee(String idemployee) {
-        Employee emp = employeeRepository.findById(idemployee).orElse(null);
+        Employee emp = employeeRepository.findByIdemployee(idemployee);
         if(emp == null){
-            return ResponseEntity.ok().body(new ResponeObject(HttpStatus.NOT_FOUND.value(), "Not found employee",""));
+            return ResponseEntity.ok().body(new ResponeObject(HttpStatus.NOT_FOUND.value(), "Không tìm thấy nhân viên",""));
         }
-        emp.setStatus(0);
-        employeeRepository.save(emp);
-        return ResponseEntity.ok().body(new ResponeObject(HttpStatus.OK.value(), "Delete employee successfully",""));
+        System.out.println(contractEmployeeServiceClient.checkEmployee(idemployee));
+        if(contractEmployeeServiceClient.checkEmployee(idemployee)){
+            return ResponseEntity.ok().body(
+                    new ResponeObject(HttpStatus.BAD_REQUEST.value(), "Không thể xóa nhân viên này","")
+            );
+        }
+        employeeRepository.delete(emp);
+        accountServiceClient.deleteAccount(idemployee);
+        return ResponseEntity.ok().body(new ResponeObject(HttpStatus.OK.value(), "Xóa nhân viên thành công",""));
     }
 
 }

@@ -16,4 +16,5 @@ public interface AccountService {
     ResponseEntity<?>changePassword(ChangePasswordRequest changePasswordRequest);
     ResponseEntity<?>loginHomePage(AccountRequest accountRequest);
     String changStatusAccount(String idemployee);
+    ResponseEntity<?> deleteAccount(String username);
 }

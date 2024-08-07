@@ -250,4 +250,10 @@ public class ContractServiceImpl implements ContractService {
         }
         return count;
     }
+
+    @Override
+    public Boolean checkIdEmployeeInContract(String idemployee) {
+        List <Contract> contracts = contractRepository.findByIdemployee(idemployee);
+        return !contracts.isEmpty();
+    }
 }

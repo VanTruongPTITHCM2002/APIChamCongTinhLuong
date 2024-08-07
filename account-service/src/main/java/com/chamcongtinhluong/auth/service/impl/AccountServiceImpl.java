@@ -167,5 +167,13 @@ public class AccountServiceImpl implements AccountService {
         return "Thành công";
     }
 
+    @Override
+    public ResponseEntity<?> deleteAccount(String username) {
+        Account account = accountRepository.findByUsername(username).orElse(null);
+        accountRepository.delete(account);
+        return ResponseEntity.ok()
+                .body(ResponseObject.builder().status(HttpStatus.OK.value())
+                        .message("Xóa tài khoản nhân viên thành công").data("").build());
+    }
 
 }

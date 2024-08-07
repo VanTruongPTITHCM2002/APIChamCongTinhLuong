@@ -39,7 +39,7 @@ public class GatewayConfig {
                         .uri("http://localhost:8082"))
                 .route("employee-service-admin", r -> r.path(
                                         "/api/v1/employee/**")
-                                .and().method(HttpMethod.GET,HttpMethod.PUT,HttpMethod.POST)
+                                .and().method(HttpMethod.GET,HttpMethod.PUT,HttpMethod.POST,HttpMethod.DELETE)
                         .filters(f->f.filter(JwtAdminAuthenticationFilter
                                 .builder().checkpath("/api/v1/employee/**").build()))
                         .uri("http://localhost:8080"))
