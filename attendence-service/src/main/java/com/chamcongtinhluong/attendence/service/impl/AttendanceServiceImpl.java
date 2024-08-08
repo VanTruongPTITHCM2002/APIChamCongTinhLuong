@@ -41,6 +41,9 @@ public class AttendanceServiceImpl implements AttendanceService {
     WorkScheduleServiceClient workScheduleServiceClient;
 
     public static String formatTime(Time time) {
+        if(time == null){
+            return "";
+        }
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
         return formatter.format(time);
     }
@@ -107,9 +110,9 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendance.setDateattendance(attendanceRequest.getDateattendance());
         attendance.setCheckintime(parseTime(attendanceRequest.getCheckintime()));
 //        attendance.setCheckouttime(parseTime(attendanceRequest.getCheckouttime()));
-//        AttendanceStatus attendanceStatus =attendanceStatusRepository.findById(StatusAttendance.getCodeFromStatus(attendanceRequest.getStatus())).orElse(null);
-//        attendance.setAttendanceStatus(attendanceStatus);
-//        attendance.setNumberwork(attendanceRequest.getNumberwork());
+        AttendanceStatus attendanceStatus =attendanceStatusRepository.findById(StatusAttendance.getCodeFromStatus(attendanceRequest.getStatus())).orElse(null);
+        attendance.setAttendanceStatus(attendanceStatus);
+        attendance.setNumberwork(attendanceRequest.getNumberwork());
         WorkRecord workRecord = workRecordRepository.findByMonthAndYear(
                 attendanceRequest.getDateattendance().getMonth() + 1,
                 attendanceRequest.getDateattendance().getYear() + 1900

@@ -31,6 +31,25 @@ public class WorkScheduleDetailImpl implements WorkScheduleDetailService {
     private EmployeeServiceClient employeeServiceClient;
 
     @Override
+    public ResponseEntity<?> getWorkScheduleDetail() {
+        List<WorkScheduleDetailRequest> workScheduleDetailRequestList = workScheduleDetailsRepository.findAll()
+
+                .stream().map(
+                        workScheduleDetails ->
+                                WorkScheduleDetailRequest.builder()
+                                        .idemployee(workScheduleDetails.getEmployeeWorkScheduleId().getIdemployee())
+                                        .workdate(workScheduleDetails.getWorkSchedule().getWorkdate())
+                                        .build()
+                ).toList();
+        return ResponseEntity.ok().body(
+                ApiResponse.builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Lấy dữ liệu thành công")
+                        .data(workScheduleDetailRequestList).build()
+        );
+    }
+
+    @Override
     public ResponseEntity<?> getWorkScheduleDetailById(String idemeployee) {
         List<WorkScheduleDetailRequest> workScheduleDetailRequestList = workScheduleDetailsRepository
                 .findAll().stream().filter(workScheduleDetails -> workScheduleDetails.getEmployeeWorkScheduleId()

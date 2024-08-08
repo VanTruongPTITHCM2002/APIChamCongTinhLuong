@@ -16,6 +16,11 @@ public class WorkScheduleDetailController {
     @Autowired
     private WorkScheduleDetailService workScheduleDetailService;
 
+    @GetMapping
+    private ResponseEntity<?> getAllWorkScheduleDetails(){
+        return workScheduleDetailService.getWorkScheduleDetail();
+    }
+
     @GetMapping("/{idemployee}")
     private ResponseEntity<?> getWorkScheduleDetailsById(@PathVariable String idemployee){
         return workScheduleDetailService.getWorkScheduleDetailById(idemployee);

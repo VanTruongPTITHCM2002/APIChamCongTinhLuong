@@ -167,6 +167,46 @@ public class GatewayConfig {
                                         .userPaths(List.of("/asda"))
                                 .build()))
                         .uri("http://localhost:8085"))
+
+                .route("rewardpunish-service-admin",r->r.path("/api/v1/rewardpunish/**")
+                        .and().method(HttpMethod.GET,HttpMethod.POST,HttpMethod.DELETE)
+                        .filters(f->f.filter(JwtAdminAuthenticationFilter
+                                .builder()
+                                        .checkpath("/api/v1/rewardpunish/**")
+                                .build()))
+                        .uri("http://localhost:8086"))
+
+                .route("rewardpunish-service",r->r.path("/api/v1/rewardpunish/countRewardPunish")
+                        .or().path("/api/v1/rewardpunish/calsalary")
+                        .filters(f->f.filter(JwtAuthenticationFilter
+                                .builder()
+                                        .adminPaths(Arrays.asList("/api/v1/rewardpunish/countRewardPunish","/api/v1/rewardpunish/calsalary"))
+                                        .userPaths(List.of("/adssad"))
+                                .build()))
+                        .uri("http://localhost:8086"))
+
+                .route("contract-service-admin",r->r.path("/api/v1/contract/**")
+                        .and().method(HttpMethod.POST,HttpMethod.GET,HttpMethod.PUT)
+                        .filters(f->f.filter(JwtAdminAuthenticationFilter
+                                .builder()
+                                        .checkpath("/api/v1/contract/**")
+                                .build()))
+                        .uri("http://localhost:8087"))
+                .route("contract-service",r->r.path("/api/v1/contract/checkcontract")
+                        .or().path("/api/v1/contract/countContract")
+                        .or().path("/api/v1/contract/checkemployee/**")
+                        .or().path("/api/v1/contract/getcontract")
+                        .or().path("/api/v1/contract/statusContract")
+                        .filters(f-> f.filter(JwtAuthenticationFilter
+                                .builder()
+                                        .adminPaths(Arrays.asList("/api/v1/contract/checkcontract"
+                                        ,"/api/v1/contract/countContract"
+                                        ,"/api/v1/contract/checkemployee/**"
+                                        ,"/api/v1/contract/getcontract"
+                                        ,"/api/v1/contract/statusContract"))
+                                .build()))
+                        .uri("http://localhost:8087"))
                 .build();
+
     }
 }
