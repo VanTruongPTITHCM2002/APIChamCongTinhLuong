@@ -113,7 +113,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         AttendanceStatus attendanceStatus =attendanceStatusRepository.findById(StatusAttendance.getCodeFromStatus(attendanceRequest.getStatus())).orElse(null);
         attendance.setAttendanceStatus(attendanceStatus);
         attendance.setNumberwork(attendanceRequest.getNumberwork());
-        WorkRecord workRecord = workRecordRepository.findByMonthAndYear(
+        WorkRecord workRecord = workRecordRepository.findByIdemployeeAndMonthAndYear(attendanceRequest.getIdemployee(),
                 attendanceRequest.getDateattendance().getMonth() + 1,
                 attendanceRequest.getDateattendance().getYear() + 1900
         );
@@ -145,7 +145,8 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendance.setCheckouttime(parseTime(attendanceRequest.getCheckouttime()));
         AttendanceStatus attendanceStatus =attendanceStatusRepository.findById(StatusAttendance.getCodeFromStatus(attendanceRequest.getStatus())).orElse(null);
         attendance.setAttendanceStatus(attendanceStatus);
-        WorkRecord workRecord = workRecordRepository.findByMonthAndYear(
+        WorkRecord workRecord = workRecordRepository.findByIdemployeeAndMonthAndYear(
+                attendanceRequest.getIdemployee(),
                 attendanceRequest.getDateattendance().getMonth() + 1,
                 attendanceRequest.getDateattendance().getYear() + 1900
         );
