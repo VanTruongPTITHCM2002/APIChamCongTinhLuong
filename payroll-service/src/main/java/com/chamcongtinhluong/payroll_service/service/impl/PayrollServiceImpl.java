@@ -38,6 +38,8 @@ public class PayrollServiceImpl implements PayrollService {
     @Autowired
     RewardPunishPayrollClient rewardPunishPayrollClient;
 
+
+
     @Override
     public ResponseEntity<?> getListSalary() {
         List<PayrollResponse> responses= payrollRepository.findAll().stream().map(
@@ -221,6 +223,9 @@ public class PayrollServiceImpl implements PayrollService {
                 idEmployeeClient.setIdemployee(linkedHashMap.get("idemployee").toString());
                 idEmployeeClientList.add(idEmployeeClient);
             }
+            idEmployeeClientList = idEmployeeClientList.stream().filter(
+                    e -> payrollContractClient.checkContractById(e.getIdemployee(), new Date())
+            ).toList();
             return ResponseEntity.ok().body(idEmployeeClientList);
         }
         return null;

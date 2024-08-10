@@ -23,7 +23,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AttendanceServiceImpl implements AttendanceService {
@@ -201,13 +200,15 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public ResponseEntity<?> updateAttendanceByAdmin(AttendanceRequest attendanceRequest) throws ParseException {
         Attendance attendance = attendanceRepository.findByIdemployeeAndDateattendance(attendanceRequest.getIdemployee(), attendanceRequest.getDateattendance());
+
         attendance.setIdemployee(attendanceRequest.getIdemployee());
         attendance.setDateattendance(attendanceRequest.getDateattendance());
         attendance.setCheckintime(parseTime(attendanceRequest.getCheckintime()));
         attendance.setCheckouttime(parseTime(attendanceRequest.getCheckouttime()));
         AttendanceStatus attendanceStatus =attendanceStatusRepository.findById(StatusAttendance.getCodeFromStatus(attendanceRequest.getStatus())).orElse(null);
         attendance.setAttendanceStatus(attendanceStatus);
-        WorkRecord workRecord = workRecordRepository.findByMonthAndYear(
+        WorkRecord workRecord = workRecordRepository.findByIdemployeeAndMonthAndYear(
+                attendanceRequest.getIdemployee(),
                 attendanceRequest.getDateattendance().getMonth() + 1,
                 attendanceRequest.getDateattendance().getYear() + 1900
         );
@@ -252,6 +253,15 @@ public class AttendanceServiceImpl implements AttendanceService {
                     .build());
         }
 
+        Attendance attendanceCheck = attendanceRepository.findByIdemployeeAndDateattendance(attendanceRequest.getIdemployee(),attendanceRequest.getDateattendance());
+        if(attendanceCheck != null){
+            return ResponseEntity.ok().body(ApiResponse.builder()
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .message("Nhân viên đã chấm công rồi quản lý không thể thêm giúp")
+                    .data("")
+                    .build());
+        }
+
         Attendance attendance = new Attendance();
         attendance.setIdemployee(attendanceRequest.getIdemployee());
         attendance.setDateattendance(attendanceRequest.getDateattendance());
@@ -260,7 +270,8 @@ public class AttendanceServiceImpl implements AttendanceService {
         AttendanceStatus attendanceStatus =attendanceStatusRepository.findById(StatusAttendance.getCodeFromStatus(attendanceRequest.getStatus())).orElse(null);
         attendance.setAttendanceStatus(attendanceStatus);
         attendance.setNumberwork(attendanceRequest.getNumberwork());
-        WorkRecord workRecord = workRecordRepository.findByMonthAndYear(
+        WorkRecord workRecord = workRecordRepository.findByIdemployeeAndMonthAndYear(
+                attendanceRequest.getIdemployee(),
                 attendanceRequest.getDateattendance().getMonth() + 1,
                 attendanceRequest.getDateattendance().getYear() + 1900
         );
@@ -269,7 +280,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.builder()
                 .status(HttpStatus.CREATED.value())
-                .message("Chấm công vào thành công")
+                .message("Thực hiện chấm công thành công")
                 .data("")
                 .build());
     }

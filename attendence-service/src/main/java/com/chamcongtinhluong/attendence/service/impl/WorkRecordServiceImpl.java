@@ -1,5 +1,6 @@
 package com.chamcongtinhluong.attendence.service.impl;
 
+import com.chamcongtinhluong.attendence.communicate.ContractServiceClient;
 import com.chamcongtinhluong.attendence.communicate.IdEmployeeClient;
 import com.chamcongtinhluong.attendence.communicate.IdEmployeeServiceClient;
 import com.chamcongtinhluong.attendence.dto.request.WorkRecordIDEmployeeRequest;
@@ -28,6 +29,9 @@ public class WorkRecordServiceImpl implements WorkRecordService {
 
     @Autowired
     IdEmployeeServiceClient idEmployeeServiceClient;
+
+    @Autowired
+    ContractServiceClient contractServiceClient;
 
     @Override
     public ResponseEntity<?> getWorkRecord() {
@@ -132,7 +136,9 @@ public class WorkRecordServiceImpl implements WorkRecordService {
                 idEmployeeClient.setIdemployee(linkedHashMap.get("idemployee").toString());
                 idEmployeeClientList.add(idEmployeeClient);
             }
-
+            idEmployeeClientList = idEmployeeClientList.stream().filter(
+                    e -> contractServiceClient.checkContractById(e.getIdemployee(), new Date())
+            ).toList();
 
             return ResponseEntity.ok().body(idEmployeeClientList);
         }
