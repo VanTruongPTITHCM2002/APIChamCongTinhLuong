@@ -15,17 +15,17 @@ public interface ContractRepository extends JpaRepository<Contract,Integer> {
 
     List<Contract> findByIdemployee(String idemployee);
 
-    Contract findByIdemployeeAndStartdateBeforeAndEndateAfter(
+    List<Contract> findByIdemployeeAndStartdateBeforeAndEndateAfter(
             String idemployee, Date endate, Date startdate);
 
     Contract findByIdemployeeAndStartdateAndEndate(
             String idemployee, Date startdate, Date endate);
 
 
-    Contract findByIdemployeeAndStartdateAfter(
+    List<Contract> findByIdemployeeAndStartdateAfter(
             String idemployee, Date startdate);
 
-    Contract findByIdemployeeAndEndateBefore(
+    List<Contract> findByIdemployeeAndEndateBefore(
             String idemployee, Date endate);
 
     @Query("SELECT c FROM Contract c WHERE c.idemployee = :idemployee AND :currentDate BETWEEN c.startdate AND c.endate AND c.status = 1")

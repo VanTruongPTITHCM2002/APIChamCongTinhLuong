@@ -87,9 +87,9 @@ public class ContractServiceImpl implements ContractService {
     @Transactional
     public String checkContractConflicts(String idemployee, Date startdate, Date endate) {
         // Kiểm tra hợp đồng có khoảng thời gian xung đột
-        Contract conflictingContracts = contractRepository.findByIdemployeeAndStartdateBeforeAndEndateAfter(
+        List<Contract> conflictingContracts = contractRepository.findByIdemployeeAndStartdateBeforeAndEndateAfter(
                 idemployee, endate, startdate);
-        if (conflictingContracts != null) {
+        if (!conflictingContracts.isEmpty()) {
             return "Khoảng thời gian của hợp đồng mới bị xung đột với hợp đồng hiện có.";
         }
 
@@ -102,16 +102,16 @@ public class ContractServiceImpl implements ContractService {
 
 
         // Kiểm tra hợp đồng bắt đầu sau một ngày cụ thể
-        Contract startDateAfterContracts = contractRepository.findByIdemployeeAndStartdateAfter(
+        List<Contract> startDateAfterContracts = contractRepository.findByIdemployeeAndStartdateAfter(
                 idemployee, startdate);
-        if (startDateAfterContracts != null) {
+        if (!startDateAfterContracts.isEmpty()) {
             return "Hợp đồng đã tồn tại bắt đầu sau ngày bắt đầu của hợp đồng mới.";
         }
 
         // Kiểm tra hợp đồng kết thúc trước một ngày cụ thể
-        Contract endDateBeforeContracts = contractRepository.findByIdemployeeAndEndateBefore(
+        List<Contract> endDateBeforeContracts = contractRepository.findByIdemployeeAndEndateBefore(
                 idemployee, endate);
-        if (endDateBeforeContracts != null) {
+        if (!endDateBeforeContracts.isEmpty()) {
             return "Hợp đồng đã tồn tại kết thúc trước ngày kết thúc của hợp đồng mới.";
         }
 
@@ -175,7 +175,7 @@ public class ContractServiceImpl implements ContractService {
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.builder()
                         .status(HttpStatus.OK.value())
-                        .message("thay đổi thành công")
+                        .message("Thay đổi thành công hợp đồng")
                         .data("")
                         .build()
         );

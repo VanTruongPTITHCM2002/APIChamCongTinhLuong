@@ -71,6 +71,9 @@ public class JwtAuthenticationFilter  implements GatewayFilter  {
 
 
             if (adminPaths.stream().anyMatch(path::startsWith) && !role.equals("ADMIN")) {
+                if(path.contains("change_password")){
+                    return chain.filter(exchange);
+                }
                 exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
 
                 return exchange.getResponse().setComplete();

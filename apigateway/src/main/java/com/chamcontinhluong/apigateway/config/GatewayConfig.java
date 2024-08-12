@@ -30,12 +30,11 @@ public class GatewayConfig {
                 .route("auth-service",
                         r -> r.path("/api/v1/account/**")
                         .or().path("/api/v1/create_account")
-                        .or().path("/api/v1/change_password")
+
                         .filters(f -> f.filter(JwtAuthenticationFilter.builder()
 
-                                .userPaths(Arrays.asList( "/api/v1/change_password"))
-                                .adminPaths(Arrays.asList("/api/v1/account","api/v1/account/**","/api/v1/create_account," +
-                                        "/api/v1/change_password")).build()))
+                                .userPaths(Arrays.asList( "/asdad"))
+                                .adminPaths(Arrays.asList("/api/v1/account","api/v1/account/**","/api/v1/create_account")).build()))
                         .uri("http://localhost:8082"))
                 .route("employee-service-admin", r -> r.path(
                                         "/api/v1/employee/**")
