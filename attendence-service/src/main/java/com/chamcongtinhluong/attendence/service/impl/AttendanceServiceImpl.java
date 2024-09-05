@@ -276,8 +276,10 @@ public class AttendanceServiceImpl implements AttendanceService {
                 attendanceRequest.getDateattendance().getYear() + 1900
         );
         attendance.setWorkRecord(workRecord);
+        workRecord.setDay_work(workRecord.getDay_work() + attendanceRequest.getNumberwork());
         attendanceRepository.save(attendance);
 
+        workRecordRepository.save(workRecord);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Thực hiện chấm công thành công")

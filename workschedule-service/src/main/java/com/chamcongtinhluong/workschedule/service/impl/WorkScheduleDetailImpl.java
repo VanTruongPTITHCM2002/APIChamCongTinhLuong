@@ -77,6 +77,11 @@ public class WorkScheduleDetailImpl implements WorkScheduleDetailService {
     }
 
     @Override
+    public ResponseEntity<?> addWorkScheduleManyEmployee(List<String> listEmployee) {
+        return null;
+    }
+
+    @Override
     public ResponseEntity<?> updateWorkScheduleDetail(String idemployee, WorkScheduleDetailRequest workScheduleDetailRequest) {
         WorkSchedule workSchedule = workScheduleRepository.findByWorkdate(workScheduleDetailRequest.getWorkdate());
         if(workSchedule == null){

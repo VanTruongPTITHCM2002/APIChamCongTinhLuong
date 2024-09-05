@@ -104,7 +104,7 @@ public class WorkScheduleImpl implements WorkScheduleService {
         List<WorkScheduleDetails> isExits = workScheduleDetailsRepository.findAll().stream().filter(
                 e->(e.getEmployeeWorkScheduleId().getWorkschedule() == workScheduleDetails.getEmployeeWorkScheduleId().getWorkschedule() &&
                         e.getEmployeeWorkScheduleId().getIdemployee().equals(workScheduleDetails.getEmployeeWorkScheduleId().getIdemployee()))).toList();
-        if(isExits.size()>0)
+        if(!isExits.isEmpty())
         {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().status(HttpStatus.BAD_REQUEST.value()).message("Nhân viên đã có lịch làm việc").data("").build());
         }
