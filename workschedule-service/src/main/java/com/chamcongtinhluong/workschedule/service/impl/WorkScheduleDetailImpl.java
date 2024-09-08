@@ -2,6 +2,7 @@ package com.chamcongtinhluong.workschedule.service.impl;
 
 import com.chamcongtinhluong.workschedule.commiunicate.EmployeeServiceClient;
 import com.chamcongtinhluong.workschedule.dto.ApiResponse;
+import com.chamcongtinhluong.workschedule.dto.ListEmployeeRequest;
 import com.chamcongtinhluong.workschedule.dto.WorkScheduleDetailRequest;
 import com.chamcongtinhluong.workschedule.entity.EmployeeWorkScheduleId;
 import com.chamcongtinhluong.workschedule.entity.WorkSchedule;
@@ -77,8 +78,28 @@ public class WorkScheduleDetailImpl implements WorkScheduleDetailService {
     }
 
     @Override
-    public ResponseEntity<?> addWorkScheduleManyEmployee(List<String> listEmployee) {
-        return null;
+    public ResponseEntity<?> addWorkScheduleManyEmployee(ListEmployeeRequest listEmployeeRequest) {
+
+        WorkSchedule workSchedule = workScheduleRepository.findByWorkdate(listEmployeeRequest.getDateWork());
+        if(workSchedule == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().status(HttpStatus.BAD_REQUEST.value()).message("Lịch làm việc không tồn tại").data("").build());
+        }
+        for(String idemployee : listEmployeeRequest.getListEmployee()){
+            WorkScheduleDetails workScheduleDetails = new WorkScheduleDetails();
+            workScheduleDetails.setEmployeeWorkScheduleId(new EmployeeWorkScheduleId(workSchedule.getIdwork_schedule(),idemployee));
+            workScheduleDetails.setWorkSchedule(workSchedule);
+            List<WorkScheduleDetails> isExits = workScheduleDetailsRepository.findAll().stream().filter(
+                    e->(e.getEmployeeWorkScheduleId().getWorkschedule() == workScheduleDetails.getEmployeeWorkScheduleId().getWorkschedule() &&
+                            e.getEmployeeWorkScheduleId().getIdemployee().equals(workScheduleDetails.getEmployeeWorkScheduleId().getIdemployee()))).toList();
+            if(!isExits.isEmpty())
+            {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().status(HttpStatus.BAD_REQUEST.value()).message("Nhân viên đã có lịch làm việc").data("").build());
+            }
+            workScheduleDetailsRepository.save(workScheduleDetails);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.builder().status(HttpStatus.CREATED.value()).message("Thêm  nhân viên vào ca làm việc thành công").data("").build());
+
     }
 
     @Override
