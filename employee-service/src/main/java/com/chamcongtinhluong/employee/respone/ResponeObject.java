@@ -1,21 +1,18 @@
 package com.chamcongtinhluong.employee.respone;
 
 import com.chamcongtinhluong.employee.entity.Employee;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
 
 import java.util.List;
 
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponeObject {
     private int status;
     private String message;
     private Object data;
-
-
 }

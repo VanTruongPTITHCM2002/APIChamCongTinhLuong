@@ -13,62 +13,102 @@ import com.chamcongtinhluong.auth.repository.AccountRepository;
 import com.chamcongtinhluong.auth.repository.RoleRepository;
 import com.chamcongtinhluong.auth.service.AccountService;
 import com.chamcongtinhluong.auth.utils.ConvertStatus;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class AccountServiceImpl implements AccountService {
 
-    @Autowired
-    private AccountRepository accountRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private ConvertStatus convertStatus;
-
-    @Autowired
-    private JwtService jwtService;
+    private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+    private final ConvertStatus convertStatus;
+    private final JwtService jwtService;
 
     @Override
     public ResponseEntity<?> getAccounts() {
-        List<AccountResponse> lst = new ArrayList<>();
-        for(Account acc: accountRepository.findAll().stream().filter(e -> !e.getRoles().getRolename().equals("ADMIN")).toList()){
-           AccountResponse accountResponse = new AccountResponse();
-           accountResponse.setUsername(acc.getUsername());
-           accountResponse.setRole(acc.getRoles().getRolename().equals("USER") ?"Nhân viên": "Quản lý");
-           accountResponse.setStatus(convertStatus.convert(acc.getStatus()));
-            lst.add(accountResponse);
+        try{
+            List<AccountResponse> listAccount = roleRepository.findByRole("USER").stream()
+                    .map(account ->
+                            AccountResponse.builder()
+                                    .username(account.getUsername())
+                                    .role("Nhân viên")
+                                    .status(convertStatus.convert(account.getStatus()))
+                                    .build()
+                    )
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok().body(
+                    ResponseObject.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("Lấy danh sách tài khoản thành công")
+                            .data(listAccount)
+                            .build()
+            );
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(
+                            ResponseObject.builder()
+                                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                    .message("Lỗi kết nối đến server " + e.getMessage())
+                                    .build()
+                    );
         }
-        return ResponseEntity.ok().body(new ResponseObject(HttpStatus.OK.value(),"Get Account successfully",lst));
+
     }
 
     @Override
     public ResponseEntity<?> getAccountByUsername(AccountRequest accountRequest) {
-        Account account = accountRepository.findByUsername(accountRequest.getUsername()).orElse(null);
-        if(account == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject(HttpStatus.NOT_FOUND.value(),"Không tìm thấy tài khoản",null));
-        }
-        if(!passwordEncoder.matches(accountRequest.getPassword(),account.getPassword())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(HttpStatus.BAD_REQUEST.value(),"Tài khoản hoặc mật khẩu không đúng",null));
-        }
-        AccountDTO accountDTO = new AccountDTO();
-        //  acc.setPassword(passwordEncoder.encode(acc.getPassword()));
+        try{
+            Account account = accountRepository.findByUsername(accountRequest.getUsername()).orElse(null);
 
-        accountDTO.setUsername(account.getUsername());
-        accountDTO.setToken(jwtService.generateToken(account.getUsername(),account.getRoles().getRolename()));
-        accountDTO.setRole(account.getRoles().getRolename());
-        accountDTO.setStatus(account.getStatus());
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK.value(),"Đăng nhập thành công",accountDTO));
+            if(!passwordEncoder.matches(accountRequest.getPassword(),account.getPassword())){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        ResponseObject.builder()
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .message("Tài khoản hoặc mật khẩu không đúng")
+                                .build()
+                );
+            }
+
+
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ResponseObject.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("Đăng nhập thành công")
+                            .data(AccountDTO.builder()
+                                    .username(account.getUsername())
+                                    .token(jwtService.generateToken(account.getUsername(),account.getRoles().getRolename()))
+                                    .role(account.getRoles().getRolename())
+                                    .status(account.getStatus())
+                                    .build())
+                            .build()
+            );
+        }catch (NullPointerException nullPointerException){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ResponseObject.builder()
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .message("Không tìm thấy tài khoản " + accountRequest.getUsername())
+                            .build()
+            );
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(
+                            ResponseObject.builder()
+                                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                    .message("Kết nối tới server có lỗi " + e.getMessage())
+                                    .build()
+                    );
+        }
+
     }
 
     @Override
@@ -80,6 +120,7 @@ public class AccountServiceImpl implements AccountService {
         account.setRoles(role);
         account.setCreate_at(new Date());
         accountRepository.save(account);
+        log.info("Tài Khoản đã được tạo");
         return "Created account success";
     }
 
@@ -140,10 +181,20 @@ public class AccountServiceImpl implements AccountService {
     public ResponseEntity<?> loginHomePage(AccountRequest accountRequest) {
         Account account = accountRepository.findByUsername(accountRequest.getUsername()).orElse(null);
         if(account == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObject(HttpStatus.NOT_FOUND.value(),"Không tìm thấy tài khoản",null));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ResponseObject.builder()
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .message("Không tìm thấy tài khoản " + accountRequest.getUsername())
+                            .build()
+            );
         }
         if(!passwordEncoder.matches(accountRequest.getPassword(),account.getPassword())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(HttpStatus.BAD_REQUEST.value(),"Tài khoản hoặc mật khẩu không đúng",null));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ResponseObject.builder()
+                            .status(HttpStatus.BAD_REQUEST.value())
+                            .message("Tài khoản hoặc mật khẩu không đúng")
+                            .build()
+            );
         }
         Map<String,String> map = new HashMap();
         String token = jwtService.generateToken(account.getUsername(),account.getRoles().getRolename());

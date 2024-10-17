@@ -6,6 +6,7 @@ import com.chamcongtinhluong.auth.dto.ChangePasswordRequest;
 import com.chamcongtinhluong.auth.entity.CreateAccountRequest;
 import com.chamcongtinhluong.auth.service.AccountService;
 import com.chamcongtinhluong.auth.service.EmailService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,15 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-
 @RequestMapping("api/v1")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private AccountService accountService;
-
-    @Autowired
-    private EmailService emailService;
+    private final AccountService accountService;
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/token")
@@ -64,11 +61,11 @@ public class AuthController {
     public String createAccount(@RequestBody CreateAccountRequest request) {
         return accountService.addAccountFromClient(request);
     }
-    @GetMapping("/send-email")
-    public String sendEmail(@RequestParam String to, @RequestParam String subject, @RequestParam String text) {
-        emailService.sendSimpleMessage(to, subject, text);
-        return "Email sent!";
-    }
+//    @GetMapping("/send-email")
+//    public String sendEmail(@RequestParam String to, @RequestParam String subject, @RequestParam String text) {
+//        emailService.sendSimpleMessage(to, subject, text);
+//        return "Email sent!";
+//    }
 
     @PutMapping("/account/changestatus/{idemployee}")
     public String changeStatus(@PathVariable String idemployee){

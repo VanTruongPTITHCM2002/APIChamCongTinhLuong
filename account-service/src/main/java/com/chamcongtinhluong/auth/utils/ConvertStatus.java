@@ -5,34 +5,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConvertStatus {
     public String convert(int number) {
-        String status = "";
-        switch (number) {
-            case 0:
-                status = "Ngưng hoạt động";
-                break;
-            case 1:
-                status = "Đang hoạt động";
-                break;
-            default:
-                status = "";
-
-        }
-        return status;
+        return switch (number) {
+            case 0 -> "Ngưng hoạt động";
+            case 1 -> "Đang hoạt động";
+            default -> "";
+        };
     }
 
     public int convert(String str) {
-        int number = 0;
-        switch (str) {
-            case "Ngưng hoạt động":
-                number = 0;
-                break;
-            case "Đang hoạt động":
-                number = 1;
-                break;
-            default:
-                number = -1;
-
-        }
-        return number;
+        return switch (str) {
+            case "Ngưng hoạt động" -> 0;
+            case "Đang hoạt động" -> 1;
+            default -> -1;
+        };
     }
+
 }

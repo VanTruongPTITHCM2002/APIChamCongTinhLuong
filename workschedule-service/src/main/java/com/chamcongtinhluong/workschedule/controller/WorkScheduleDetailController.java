@@ -1,5 +1,6 @@
 package com.chamcongtinhluong.workschedule.controller;
 
+import com.chamcongtinhluong.workschedule.dto.ListEmployeeRequest;
 import com.chamcongtinhluong.workschedule.dto.WorkScheduleDetailRequest;
 import com.chamcongtinhluong.workschedule.service.WorkScheduleDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,11 @@ public class WorkScheduleDetailController {
     @PostMapping
     private Boolean getWorkScheduleDetailByIdAndDate(@RequestParam String idemployee,@RequestParam Date date){
         return workScheduleDetailService.getWorkScheduleByIdAndDate(idemployee,date);
+    }
+
+    @PostMapping("/add-employees")
+    private ResponseEntity<?> addManyEmployeeWorkScheduleDetail(@RequestBody ListEmployeeRequest listEmployeeRequest){
+        return workScheduleDetailService.addWorkScheduleManyEmployee(listEmployeeRequest);
     }
 
     @PutMapping("/{idemployee}")

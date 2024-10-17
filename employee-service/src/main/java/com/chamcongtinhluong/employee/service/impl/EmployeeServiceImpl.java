@@ -15,31 +15,27 @@ import com.chamcongtinhluong.employee.repository.DegreeRepository;
 import com.chamcongtinhluong.employee.repository.EmployeeRepository;
 import com.chamcongtinhluong.employee.respone.ResponeObject;
 import com.chamcongtinhluong.employee.service.EmployeeService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.net.ConnectException;
 import java.util.List;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
-
-    @Autowired
-    private DegreeRepository degreeRepository;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private AccountServiceClient accountServiceClient;
-
-    @Autowired
-    private ContractEmployeeServiceClient contractEmployeeServiceClient;
+    private final EmployeeRepository employeeRepository;
+    private final DegreeRepository degreeRepository;
+    private final JdbcTemplate jdbcTemplate;
+    private final AccountServiceClient accountServiceClient;
+    private final ContractEmployeeServiceClient contractEmployeeServiceClient;
 
     @Override
     public String generateEmployeeId() {
@@ -92,25 +88,40 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ResponseEntity<?> getEmployee() {
-        List<EmployeeDTO> employeeDTOList = employeeRepository.findAll().stream()
-                .filter(e->!e.getIdemployee().equals("NV001"))
-                .map(
-                e-> new EmployeeDTO(
-                        e.getIdemployee(),
-                        e.getFirstname(),
-                        e.getLastname(),
-                        e.getGender(),
-                        e.getBirthdate(),
-                        e.getCmnd(),
-                        e.getEmail(),
-                        e.getPhonenumber(),
-                        e.getAddress(),
-                       DegreeNumber.getStatusFromCode(e.getDegree().getIddegree()),
-                        StatusEmployee.getStatusFromCode(e.getStatus())
+        try{
+            List<EmployeeDTO> employeeDTOList = employeeRepository.findAll().stream()
+                    .filter(e->!e.getIdemployee().equals("NV001"))
+                    .map(
+                            employee -> EmployeeDTO.builder()
+                                    .idemployee(employee.getIdemployee())
+                                    .firstname(employee.getFirstname())
+                                    .lastname(employee.getLastname())
+                                    .gender(employee.getGender())
+                                    .birthdate(employee.getBirthdate())
+                                    .cmnd(employee.getCmnd())
+                                    .email(employee.getEmail())
+                                    .phonenumber(employee.getPhonenumber())
+                                    .address(employee.getAddress())
+                                    .degree( DegreeNumber.getStatusFromCode(employee.getDegree().getIddegree()))
+                                    .status(StatusEmployee.getStatusFromCode(employee.getStatus()))
+                                    .build()).toList();
 
-                )
-        ).toList();
-        return ResponseEntity.ok().body(new ResponeObject(HttpStatus.OK.value(),"Danh sách nhân viên",employeeDTOList));
+            return ResponseEntity.ok().body(
+            //        new ResponeObject(HttpStatus.OK.value(),"Danh sách nhân viên",employeeDTOList)
+            ResponeObject.builder()
+                    .status(HttpStatus.OK.value())
+                    .message("Danh sách nhân viên")
+                    .data(employeeDTOList)
+                    .build()
+            );
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponeObject.builder()
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message("Lỗi kết nối không thể lấy danh sách")
+                            .build());
+        }
+
     }
 
     @Override
@@ -205,15 +216,31 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(emp == null){
             return ResponseEntity.ok().body(new ResponeObject(HttpStatus.NOT_FOUND.value(), "Không tìm thấy nhân viên",""));
         }
-        System.out.println(contractEmployeeServiceClient.checkEmployee(idemployee));
-        if(contractEmployeeServiceClient.checkEmployee(idemployee)){
-            return ResponseEntity.ok().body(
-                    new ResponeObject(HttpStatus.BAD_REQUEST.value(), "Không thể xóa nhân viên này","")
+//        System.out.println(contractEmployeeServiceClient.checkEmployee(idemployee));
+
+        try{
+                        if(contractEmployeeServiceClient.checkEmployee(idemployee)){
+                return ResponseEntity.ok().body(
+                        new ResponeObject(HttpStatus.BAD_REQUEST.value(), "Không thể xóa nhân viên này","")
+                );
+            }
+
+           //log.info("hihihi",accountServiceClient.deleteAccount(idemployee).getStatusCode());
+          accountServiceClient.deleteAccount(idemployee);
+
+            employeeRepository.delete(emp);
+            return ResponseEntity.ok().body(new ResponeObject(HttpStatus.OK.value(), "Xóa nhân viên thành công",""));
+
+        }catch (Exception connectException){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new ResponeObject(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Lỗi kết nối không thể thực hiện xoa","")
             );
+
         }
-        employeeRepository.delete(emp);
-        accountServiceClient.deleteAccount(idemployee);
-        return ResponseEntity.ok().body(new ResponeObject(HttpStatus.OK.value(), "Xóa nhân viên thành công",""));
+
+//        employeeRepository.delete(emp);
+//        accountServiceClient.deleteAccount(idemployee);
+//        return ResponseEntity.ok().body(new ResponeObject(HttpStatus.OK.value(), "Xóa nhân viên thành công",""));
     }
 
 }
