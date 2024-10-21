@@ -1,18 +1,17 @@
-package com.chamcongtinhluong.auth.dto;
+package com.chamcongtinhluong.auth.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class AccountResponse {
+@AllArgsConstructor
+@Builder
+public class AccountLoginResponse {
     private String username;
+    private String token;
     private String role;
-    private String status;
-
+    private int status;
 }

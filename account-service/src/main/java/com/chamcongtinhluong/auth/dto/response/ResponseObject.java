@@ -1,14 +1,10 @@
-package com.chamcongtinhluong.auth.entity;
+package com.chamcongtinhluong.auth.dto.response;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.Entity;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

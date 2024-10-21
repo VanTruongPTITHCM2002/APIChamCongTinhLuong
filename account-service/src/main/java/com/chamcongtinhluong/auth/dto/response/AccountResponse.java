@@ -1,4 +1,4 @@
-package com.chamcongtinhluong.auth.dto;
+package com.chamcongtinhluong.auth.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,11 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class ChangePasswordRequest {
+public class AccountResponse {
     private String username;
-    private String oldpassword;
-    private String newpassword;
+    private String role;
+    private String status;
+
 }

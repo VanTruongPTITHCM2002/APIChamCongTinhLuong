@@ -1,5 +1,6 @@
 package com.chamcongtinhluong.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,17 +19,17 @@ public class Permissons {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idpermissons")
-    private int id;
+    private int idpermissons;
 
-    @Column(name = "namepermissons",length = 100)
-    private String permissName;
+    @Column(name = "namepermisson",length = 100)
+    private String namepermisson;
 
     @Column(name = "description")
     private String description;
 
-    @Column(name = "createAt")
+    @Column(name = "create_at")
     private Date createAt;
 
-    @Column(name = "updateAt")
+    @Column(name = "update_at")
     private Date updateAt;
 }

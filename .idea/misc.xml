@@ -18,6 +18,7 @@
         <option value="$PROJECT_DIR$/rewardpunish-service/pom.xml" />
         <option value="$PROJECT_DIR$/contract_service/pom.xml" />
         <option value="$PROJECT_DIR$/discorvery_server/pom.xml" />
+        <option value="$PROJECT_DIR$/notification-service/pom.xml" />
       </list>
     </option>
   </component>

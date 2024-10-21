@@ -15,6 +15,7 @@
         <module name="workschedule" />
         <module name="attendence" />
         <module name="employee" />
+        <module name="notification-service" />
         <module name="contract_service" />
       </profile>
     </annotationProcessing>
@@ -27,6 +28,7 @@
       <module name="contract_service" options="-parameters" />
       <module name="discorvery_server" options="-parameters" />
       <module name="employee" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
       <module name="payroll-service" options="-parameters" />
       <module name="rewardpunish_service" options="-parameters" />
       <module name="workschedule" options="-parameters" />
