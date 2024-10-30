@@ -1,15 +1,15 @@
-package com.chamcontinhluong.apigateway;
+package com.chamcongtinhluong.account_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.chamcongtinhluong")
 @EnableDiscoveryClient
-public class ApigatewayApplication {
+public class AuthServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ApigatewayApplication.class, args);
+		SpringApplication.run(AuthServiceApplication.class, args);
 	}
 
 }

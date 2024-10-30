@@ -18,7 +18,6 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
-
 public class GatewayConfig {
 
 
@@ -26,7 +25,7 @@ public class GatewayConfig {
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("account-service",r->r.path("/api/v1/auth/login")
-                        .uri("http://localhost:8082"))
+                        .uri("lb://account-service"))
                 .route("auth-service",
                         r -> r.path("/api/v1/account/**")
                         .or().path("/api/v1/create_account")
@@ -35,7 +34,7 @@ public class GatewayConfig {
 
                                 .userPaths(Arrays.asList( "/asdad"))
                                 .adminPaths(Arrays.asList("/api/v1/account","api/v1/account/**","/api/v1/create_account")).build()))
-                        .uri("http://localhost:8082"))
+                        .uri("lb://account-service"))
                 .route("employee-service-admin", r -> r.path(
                                         "/api/v1/employee/**")
                                 .and().method(HttpMethod.GET,HttpMethod.PUT,HttpMethod.POST,HttpMethod.DELETE)

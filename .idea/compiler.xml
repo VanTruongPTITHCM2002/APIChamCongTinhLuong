@@ -9,12 +9,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="apigateway" />
         <module name="payroll-service" />
-        <module name="auth" />
         <module name="rewardpunish_service" />
         <module name="discorvery_server" />
         <module name="workschedule" />
         <module name="attendence" />
         <module name="employee" />
+        <module name="account-service" />
         <module name="notification-service" />
         <module name="contract_service" />
       </profile>
@@ -22,9 +22,9 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="account-service" options="-parameters" />
       <module name="apigateway" options="-parameters" />
       <module name="attendence" options="-parameters" />
-      <module name="auth" options="-parameters" />
       <module name="contract_service" options="-parameters" />
       <module name="discorvery_server" options="-parameters" />
       <module name="employee" options="-parameters" />
