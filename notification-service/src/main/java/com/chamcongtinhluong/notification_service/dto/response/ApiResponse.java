@@ -1,17 +1,17 @@
-package com.chamcongtinhluong.employee.respone;
+package com.chamcongtinhluong.notification_service.dto.response;
 
-import com.chamcongtinhluong.employee.entity.Employee;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponeObject {
+public class ApiResponse {
     private int status;
     private String message;
     private Object data;

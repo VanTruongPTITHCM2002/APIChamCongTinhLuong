@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface RolePermissonsRepository extends JpaRepository<RolePermissons,RolePermissonsID> {
     List<RolePermissons> findByRolePermissonsID_Permissons(int permissons);
+    List<RolePermissons> findByRolePermissonsID_Role(int role);
+    Boolean existsByRolePermissonsID_RoleAndRolePermissonsID_Permissons(int role,int permissons);
 }

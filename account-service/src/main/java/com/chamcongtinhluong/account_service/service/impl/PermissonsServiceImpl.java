@@ -1,8 +1,7 @@
 package com.chamcongtinhluong.account_service.service.impl;
 
 import com.chamcongtinhluong.account_service.dto.request.PermissonsRequest;
-import com.chamcongtinhluong.account_service.dto.response.PermissonsResponse;
-import com.chamcongtinhluong.account_service.dto.response.ResponseObject;
+import com.chamcongtinhluong.account_service.dto.response.*;
 import com.chamcongtinhluong.account_service.entity.*;
 import com.chamcongtinhluong.account_service.repository.AccountRepository;
 import com.chamcongtinhluong.account_service.repository.PermissonsRepository;
@@ -19,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -55,6 +55,25 @@ public class PermissonsServiceImpl implements PermissonsService {
                             .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                             .message("Server xay ra su co khong the lay du lieu..")
                             .build());
+        }
+
+    }
+
+    @Override
+    public ResponseEntity<?> getRolePermissons() {
+        try{
+            List<RolePermissonsResponse> rolePermissonsResponseList = roleRepository.findAll().stream()
+                    .map(role -> RolePermissonsResponse.builder()
+                            .roleName(role.getRolename())
+                            .permissonsName(rolePermissonsRepository.findByRolePermissonsID_Role(role.getIdrole()).stream()
+                                    .map(rolePermission -> rolePermission.getPermissons().getNamepermisson())
+                                    .distinct()
+                                    .collect(Collectors.toList()))
+                            .build())
+                    .collect(Collectors.toList());
+            return new ResponseSuccess(HttpStatus.OK,"Lay danh sach thanh cong",rolePermissonsResponseList);
+        }catch (Exception e){
+            return new ResponseFailure(HttpStatus.INTERNAL_SERVER_ERROR,"Loi ket noi den co so du lieu...");
         }
 
     }
@@ -156,13 +175,13 @@ public class PermissonsServiceImpl implements PermissonsService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseObject.builder()
                             .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                            .message("Loi ket noi server khong the cap nhat")
+                            .message("Loi ket noi co so du lieu khong the cap nhat")
                             .build());
         }
         return ResponseEntity.ok().body(
                 ResponseObject.builder()
                         .status(HttpStatus.OK.value())
-                        .message("Cap nhat thanh cong")
+                        .message("Cap nhat thanh cong quyen")
                         .build()
         );
     }
@@ -236,7 +255,7 @@ public class PermissonsServiceImpl implements PermissonsService {
                         );
             }
             permissonsRepository.delete(perm);
-        }catch (InvalidDataAccessApiUsageException invalidDataAccessApiUsageException){
+        }catch (NullPointerException nullPointerException){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     ResponseObject.builder()
                             .status(HttpStatus.NOT_FOUND.value())
@@ -244,6 +263,7 @@ public class PermissonsServiceImpl implements PermissonsService {
                             .build()
             );
         }catch (Exception e){
+            log.info(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(
                             ResponseObject.builder()
@@ -263,8 +283,29 @@ public class PermissonsServiceImpl implements PermissonsService {
     @Override
     public ResponseEntity<?> deletePermissonsUsers(String username,List<String>permissons) {
         try{
+            if(accountRepository.findByUsername(username).isEmpty()){
+                return new ResponseFailure(HttpStatus.NOT_FOUND,"Khong tim thay tai khoan " + username);
+            }
             Role role = accountRepository.findByUsername(username).get().getRoles();
-
+            for(String perm: permissons){
+                Permissons permissonsSearch = permissonsRepository.findByNamepermisson(perm);
+                Boolean isExistsRolePermissons = rolePermissonsRepository.existsByRolePermissonsID_RoleAndRolePermissonsID_Permissons(role.getIdrole(),permissonsSearch.getIdpermissons());
+                if(!isExistsRolePermissons){
+                    return new ResponseFailure(HttpStatus.NOT_FOUND,"That bai do khong ton tai");
+                }
+                rolePermissonsRepository.delete(
+                        RolePermissons.builder()
+                                .permissons(permissonsSearch)
+                                .role(role)
+                                .rolePermissonsID(
+                                        RolePermissonsID.builder()
+                                                .role(role.getIdrole())
+                                                .permissons(permissonsSearch.getIdpermissons())
+                                                .build()
+                                )
+                                .build()
+                );
+            }
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.OK).body(
               ResponseObject.builder()
@@ -273,7 +314,7 @@ public class PermissonsServiceImpl implements PermissonsService {
                       .build()
             );
         }
-        return null;
+        return new ResponseSuccess(HttpStatus.OK,"Xoa thanh cong");
     }
 
 }

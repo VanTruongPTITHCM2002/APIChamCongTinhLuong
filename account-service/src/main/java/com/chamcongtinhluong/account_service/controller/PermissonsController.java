@@ -21,6 +21,11 @@ public class PermissonsController {
         return permissonsService.getAllPermissons();
     }
 
+    @GetMapping("/users")
+    private ResponseEntity<?>getRolePermissons(){
+        return permissonsService.getRolePermissons();
+    }
+
     @PostMapping
     private ResponseEntity<?> addPermissons(
             @Validated
@@ -52,5 +57,11 @@ public class PermissonsController {
     @DeleteMapping
     private ResponseEntity<?> deletePermissons(@RequestParam String permissons){
         return permissonsService.deletePermissons(permissons);
+    }
+
+    @DeleteMapping("/users/{username}")
+    private ResponseEntity<?> deletePermissonsForUser(@PathVariable String username,
+                                                      @RequestBody List<String> permissons){
+        return permissonsService.deletePermissonsUsers(username,permissons);
     }
 }

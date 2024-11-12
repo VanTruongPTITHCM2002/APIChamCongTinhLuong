@@ -5,21 +5,26 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 @Component
 public class JwtService {
-    public static final String SECRET_KEY = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
-    public String generateToken(String username,String role){
+    @Value("${jwt.service.secret_key}")
+    public String SECRET_KEY;
+
+    public String generateToken(String username, String role, List<String> permissions){
         Map<String,Object> claims = new HashMap<>();
         claims.put("role", role);
+        claims.put("permissions",permissions);
         return  createToken(claims,username);
     }
 

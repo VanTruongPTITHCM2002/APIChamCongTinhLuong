@@ -1,18 +1,23 @@
 package com.chamcongtinhluong.employee.service;
 
-import com.chamcongtinhluong.employee.dto.EmployeeDTO;
-import com.chamcongtinhluong.employee.entity.Employee;
+
+import com.chamcongtinhluong.employee.dto.request.EmployeeRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface EmployeeService {
     public ResponseEntity<?> getEmployee();
     public ResponseEntity<?> getIDEmployee(String id);
-    public ResponseEntity<?> addEmployee(EmployeeDTO e);
-    public ResponseEntity<?> updateEmployee(String idemployee,EmployeeDTO e);
+    public ResponseEntity<?> addEmployee(EmployeeRequest e);
+    public ResponseEntity<?> updateEmployee(String idemployee,EmployeeRequest e);
     public ResponseEntity<?> updateStatusEmployee(String idemployee);
     public ResponseEntity<?> deleteEmployee(String idemployee);
     public String generateEmployeeId();
     public String getDetailSalary(String idemployee);
     public ResponseEntity<?> getEmployeeActive();
     public ResponseEntity<?> countEmployee();
+    public ResponseEntity<?> uploadFileEmployee(MultipartFile multipartFile,String idEmployee) throws IOException;
+    public ResponseEntity<?> getImageEmployee(String idEmployee);
 }

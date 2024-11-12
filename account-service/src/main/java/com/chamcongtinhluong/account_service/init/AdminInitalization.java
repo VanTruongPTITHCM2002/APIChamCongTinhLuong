@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @Component
 @RequiredArgsConstructor
 public class AdminInitalization {
@@ -31,6 +33,8 @@ public class AdminInitalization {
                 account.setUsername("admin");
                 account.setPassword(passwordEncoder.encode("1"));
                 account.setRoles(role);
+                account.setCreate_at(new Date());
+                account.setStatus(1);
                 accountRepository.save(account);
                 log.info("Tai khoan quan tri da duoc tao");
             }

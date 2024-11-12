@@ -9,6 +9,7 @@ import com.chamcongtinhluong.account_service.dto.request.CreateAccountRequest;
 import com.chamcongtinhluong.account_service.entity.Role;
 import com.chamcongtinhluong.account_service.filter.JwtService;
 import com.chamcongtinhluong.account_service.repository.AccountRepository;
+import com.chamcongtinhluong.account_service.repository.RolePermissonsRepository;
 import com.chamcongtinhluong.account_service.repository.RoleRepository;
 import com.chamcongtinhluong.account_service.service.AccountService;
 import com.chamcongtinhluong.account_service.utils.ConvertStatus;
@@ -30,6 +31,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final RolePermissonsRepository rolePermissonsRepository;
     private final ConvertStatus convertStatus;
     private final JwtService jwtService;
 
@@ -73,7 +75,10 @@ public class AccountServiceImpl implements AccountService {
                                 .build()
                 );
             }
-
+            List<String> permissions = rolePermissonsRepository.findByRolePermissonsID_Role(account.getRoles().getIdrole())
+                    .stream().map(
+                            rolePermissons -> rolePermissons.getPermissons().getNamepermisson()
+                    ).toList();
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     ResponseObject.builder()
@@ -82,8 +87,9 @@ public class AccountServiceImpl implements AccountService {
                             .data(
                                     AccountLoginResponse.builder()
                                     .username(account.getUsername())
-                                    .token(jwtService.generateToken(account.getUsername(),account.getRoles().getRolename()))
+                                    .token(jwtService.generateToken(account.getUsername(),account.getRoles().getRolename(),permissions))
                                     .role(account.getRoles().getRolename())
+                                    .roleDescription(account.getRoles().getRoleDescription())
                                     .status(account.getStatus())
                                     .build()
                             )
@@ -206,8 +212,12 @@ public class AccountServiceImpl implements AccountService {
                                 .build()
                 );
             }
-            Map<String,String> map = new HashMap();
-            String token = jwtService.generateToken(account.getUsername(),account.getRoles().getRolename());
+            Map<String,String> map = new HashMap<String,String>();
+            List<String> permissions = rolePermissonsRepository.findByRolePermissonsID_Role(account.getRoles().getIdrole())
+                    .stream().map(
+                            rolePermissons -> rolePermissons.getPermissons().getNamepermisson()
+                                    ).toList();
+            String token = jwtService.generateToken(account.getUsername(),account.getRoles().getRolename(),permissions);
             map.put("username",accountRequest.getUsername());
             map.put("token",token);
             return ResponseEntity.ok().body(

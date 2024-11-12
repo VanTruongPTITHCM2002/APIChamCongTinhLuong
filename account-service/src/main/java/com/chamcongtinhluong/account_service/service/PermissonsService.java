@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface PermissonsService {
     ResponseEntity<?>getAllPermissons();
+    ResponseEntity<?>getRolePermissons();
     ResponseEntity<?>addPermissons(PermissonsRequest permissonsRequest);
     ResponseEntity<?>addPermissonsUsers(String username, List<String> permissons);
     ResponseEntity<?>updatePermissons(String permissons,PermissonsRequest permissonsRequest);

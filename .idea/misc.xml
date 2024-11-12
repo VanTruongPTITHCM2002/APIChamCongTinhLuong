@@ -19,6 +19,8 @@
         <option value="$PROJECT_DIR$/discorvery_server/pom.xml" />
         <option value="$PROJECT_DIR$/notification-service/pom.xml" />
         <option value="$PROJECT_DIR$/account-service/pom.xml" />
+        <option value="$PROJECT_DIR$/deduction-service/pom.xml" />
+        <option value="$PROJECT_DIR$/leaverequest-service/pom.xml" />
       </list>
     </option>
   </component>

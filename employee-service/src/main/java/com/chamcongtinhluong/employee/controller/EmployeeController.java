@@ -1,23 +1,25 @@
 package com.chamcongtinhluong.employee.controller;
 
-import com.chamcongtinhluong.employee.dto.EmployeeDTO;
-import com.chamcongtinhluong.employee.entity.Employee;
-import com.chamcongtinhluong.employee.exception.InvalidEmployeeException;
-import com.chamcongtinhluong.employee.respone.ResponeObject;
+import com.chamcongtinhluong.employee.dto.request.EmployeeRequest;
+import com.chamcongtinhluong.employee.dto.response.ResponeObject;
 import com.chamcongtinhluong.employee.service.EmployeeService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-//@CrossOrigin(origins = "http://localhost:3000")
+import java.io.IOException;
+
+
 @RestController
 @RequestMapping("/api/v1/employee")
+@RequiredArgsConstructor
 public class EmployeeController {
 
-    @Autowired
-    EmployeeService employeeService;
+    private final EmployeeService employeeService;
 
 //    Admin
     @GetMapping
@@ -33,18 +35,24 @@ public class EmployeeController {
 // Admin
     @GetMapping("/generateId")
     public ResponseEntity<?> getIdempployee(){
-        return ResponseEntity.ok().body(new ResponeObject(HttpStatus.OK.value(), "Generate id success",employeeService.generateEmployeeId()));
+        return ResponseEntity.ok().body(
+                new ResponeObject(HttpStatus.OK.value(), "Generate id success",employeeService.generateEmployeeId()));
     }
 
 //    Admin and User
-    @GetMapping("/{idemployee}")
-    public ResponseEntity<?> getIDEmployee(@PathVariable String idemployee){
-        return employeeService.getIDEmployee(idemployee);
+    @GetMapping("/{idEmployee}")
+    public ResponseEntity<?> getIDEmployee(@PathVariable String idEmployee){
+        return employeeService.getIDEmployee(idEmployee);
     }
 
-    @GetMapping("/detail-salary/{idemployee}")
-    public  String getDetailSalary(@PathVariable String idemployee){
-        return employeeService.getDetailSalary(idemployee);
+    @GetMapping("/detail-salary/{idEmployee}")
+    public  String getDetailSalary(@PathVariable String idEmployee){
+        return employeeService.getDetailSalary(idEmployee);
+    }
+
+    @GetMapping("/{idEmployee}/image")
+    public ResponseEntity<?> getImageEmployee(@PathVariable String idEmployee){
+        return employeeService.getImageEmployee(idEmployee);
     }
 
 //    Admin
@@ -55,26 +63,32 @@ public class EmployeeController {
 
 //    Admin
     @PostMapping
-    @Transactional
-    public ResponseEntity<?> addEmployee(@RequestBody EmployeeDTO e){
+//    @Transactional
+    public ResponseEntity<?> addEmployee(@RequestBody @Valid EmployeeRequest e){
         return employeeService.addEmployee(e);
     }
 
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadFile(@RequestParam("image")MultipartFile multipartFile,
+                                        @RequestParam("idEmployee") String idEmployee) throws IOException {
+        return employeeService.uploadFileEmployee(multipartFile,idEmployee);
+    }
+
 //    Admin and user
-    @PutMapping("{idemployee}")
-    public ResponseEntity<?>updateEmployee(@PathVariable String idemployee, @RequestBody EmployeeDTO e){
-        return employeeService.updateEmployee(idemployee,e);
+    @PutMapping("{idEmployee}")
+    public ResponseEntity<?>updateEmployee(@PathVariable String idEmployee, @RequestBody EmployeeRequest e){
+        return employeeService.updateEmployee(idEmployee,e);
     }
 
 //    Admin
-    @PutMapping("/{idemployee}/changeStatus")
-    public ResponseEntity<?>updateStatusEmployee(@PathVariable String idemployee){
-        return employeeService.updateStatusEmployee(idemployee);
+    @PutMapping("/{idEmployee}/changeStatus")
+    public ResponseEntity<?>updateStatusEmployee(@PathVariable String idEmployee){
+        return employeeService.updateStatusEmployee(idEmployee);
     }
 
 //    Admin
-    @DeleteMapping("/{idemployee}")
-    public  ResponseEntity<?>deleteEmployee(@PathVariable String idemployee){
-        return  employeeService.deleteEmployee(idemployee);
+    @DeleteMapping("/{idEmployee}")
+    public  ResponseEntity<?>deleteEmployee(@PathVariable String idEmployee){
+        return  employeeService.deleteEmployee(idEmployee);
     }
 }

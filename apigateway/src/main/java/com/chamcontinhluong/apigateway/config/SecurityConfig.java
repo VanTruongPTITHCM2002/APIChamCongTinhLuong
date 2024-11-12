@@ -2,6 +2,7 @@
 //
 //
 ////import com.chamcontinhluong.apigateway.secuirty.JwtAuthenticationFilter;
+//import com.chamcontinhluong.apigateway.secuirty.JwtAuthenticationFilter;
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.context.annotation.Bean;
@@ -27,10 +28,9 @@
 //
 //@Configuration
 //@EnableWebSecurity
-//
 //public class SecurityConfig {
-////    @Autowired
-////    private JwtAuthenticationFilter jwtAuthenticationFilter;
+//    @Autowired
+//    private JwtAuthenticationFilter jwtAuthenticationFilter;
 //
 ////    @Bean
 ////    public PasswordEncoder passwordEncoder(){

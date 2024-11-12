@@ -10,12 +10,14 @@
         <module name="apigateway" />
         <module name="payroll-service" />
         <module name="rewardpunish_service" />
+        <module name="deduction-service" />
         <module name="discorvery_server" />
         <module name="workschedule" />
         <module name="attendence" />
         <module name="employee" />
         <module name="account-service" />
         <module name="notification-service" />
+        <module name="leaverequest-service" />
         <module name="contract_service" />
       </profile>
     </annotationProcessing>
@@ -26,8 +28,10 @@
       <module name="apigateway" options="-parameters" />
       <module name="attendence" options="-parameters" />
       <module name="contract_service" options="-parameters" />
+      <module name="deduction-service" options="-parameters" />
       <module name="discorvery_server" options="-parameters" />
       <module name="employee" options="-parameters" />
+      <module name="leaverequest-service" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="payroll-service" options="-parameters" />
       <module name="rewardpunish_service" options="-parameters" />

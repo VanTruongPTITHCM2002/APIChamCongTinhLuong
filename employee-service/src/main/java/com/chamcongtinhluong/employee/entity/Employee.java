@@ -1,5 +1,6 @@
 package com.chamcongtinhluong.employee.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,6 +40,9 @@ public class Employee {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "position")
+    private String position;
+
     @Column(name = "phonenumber")
     private String phonenumber;
 
@@ -49,7 +53,13 @@ public class Employee {
     @JoinColumn(name = "iddegree")
     private Degree degree;
 
+    @ManyToOne
+    @JoinColumn(name = "iddepartment")
+    private Departments departments;
 
+    @Column(name = "image", columnDefinition = "BLOB")
+    @Lob
+    private byte[] image;
 
     @Column(name="status")
     private int status;

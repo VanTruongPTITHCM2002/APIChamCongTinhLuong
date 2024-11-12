@@ -8,17 +8,23 @@ import io.jsonwebtoken.security.Keys;
 
 import io.jsonwebtoken.security.SignatureException;
 import lombok.Builder;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-@Builder
+@Component
 public class JwtService {
-    public static final String SECRET_KEY = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+    @Value("${jwt.service.secret_key}")
+    public String SECRET_KEY;
+
     public String generateToken(String username,String role){
         Map<String,Object> claims = new HashMap<>();
         claims.put("role", role);
@@ -63,7 +69,7 @@ public class JwtService {
     }
 
 
-    public Claims extractClaims(String token) {
+    public  Claims extractClaims(String token) {
         try {
             return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
         } catch (SignatureException e) {
@@ -71,7 +77,7 @@ public class JwtService {
         }
     }
 
-    public boolean isTokenExpired(String token) {
+    public  boolean isTokenExpired(String token) {
         Claims claims = extractClaims(token);
         return claims == null || claims.getExpiration().before(new Date());
     }
@@ -82,5 +88,31 @@ public class JwtService {
 
         String roles = (String) claims.get("roles"); // Lấy thông tin role từ token
         return true;
+    }
+
+    public String extractRoleFromToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.get("role", String.class); // Assuming role is stored in the "role" claim
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public  List<String> extractPermissionsFromToken(String token){
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.get("permissions", List.class); // Assuming role is stored in the "role" claim
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
