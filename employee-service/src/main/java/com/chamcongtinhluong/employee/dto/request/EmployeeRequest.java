@@ -2,6 +2,7 @@ package com.chamcongtinhluong.employee.dto.request;
 
 import com.chamcongtinhluong.employee.validation.Adult;
 import com.chamcongtinhluong.employee.validation.Unique;
+import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,10 +17,10 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeRequest {
-    @NotNull(message = "Khong hop le vi thieu ma nhan vien")
-    @NotBlank(message = "Vui long nhap ma nhan vien")
-    @Pattern(regexp = "^\\S+$", message = "Ma nhan vien khong duoc chua khoang trang")
-    private String idEmployee;
+//    @NotNull(message = "Khong hop le vi thieu ma nhan vien")
+//    @NotBlank(message = "Vui long nhap ma nhan vien")
+//    @Pattern(regexp = "^\\S+$", message = "Ma nhan vien khong duoc chua khoang trang")
+//    private String idEmployee;
     private String firstName;
     @NotNull(message = "Khong hop le vi thieu ten nhan vien")
     @NotBlank(message = "Vui long nhap ten nhan vien")
@@ -39,5 +40,4 @@ public class EmployeeRequest {
     private String position;
     private String department;
     private String status;
-    private byte[] image;
 }

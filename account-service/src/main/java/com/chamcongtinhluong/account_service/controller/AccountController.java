@@ -9,38 +9,38 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/account")
+@RequestMapping("api/v1")
 public class AccountController {
 
     private final AccountService accountService;
 
-    @GetMapping
+    @GetMapping("/account")
     public ResponseEntity<?> getAccounts(){
         return accountService.getAccounts();
     }
 
-    @PutMapping("/{username}")
+    @PutMapping("/account/{username}")
     public ResponseEntity<?> updateAccount(@PathVariable String username,
                                            @RequestBody AccountResponse accountResponse){
         return accountService.updateAccount(username,accountResponse);
     }
 
-    @PutMapping("/change_password")
+    @PutMapping("public/account/change_password")
     public  ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest){
         return accountService.changePassword(changePasswordRequest);
     }
 
-    @PutMapping("/{username}/reset_password")
+    @PutMapping("/account/{username}/reset_password")
     public ResponseEntity<?> resetPassword(@PathVariable String username){
         return accountService.resetPassword(username);
     }
 
-    @PutMapping("/changestatus/{idemployee}")
+    @PutMapping("/account/changestatus/{idemployee}")
     public String changeStatus(@PathVariable String idemployee){
         return accountService.changStatusAccount(idemployee);
     }
 
-    @DeleteMapping("/{username}")
+    @DeleteMapping("/account/{username}")
     public ResponseEntity<?> deleteAccount(@PathVariable String username){
         return accountService.deleteAccount(username);
     }

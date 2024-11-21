@@ -8,16 +8,14 @@ import java.util.Map;
 
 @Component
 public class ListURL {
-    Map<String,String> listUrl = new HashMap<String,String>();
+    Map<String,Map<String,String>> listUrl = new HashMap<>();
     public ListURL(){
-        this.listUrl.put("/api/v1/account","view_account");
-        this.listUrl.put("/api/v1/account/{username}","update_account");
-        this.listUrl.put("/api/v1/account/{username}/reset_password","reset_password");
-        this.listUrl.put("/api/v1/account/changestatus/{idemployee}","change_status_account");
-        this.listUrl.put("/api/v1/create_account","create_account");
+        this.listUrl.put("/api/v1/employee",Map.of("GET","view_employee"));
+        this.listUrl.put("/api/v1/employee/{idEmployee}",Map.of("GET","view_personal_employee"));
+        this.listUrl.put("/api/v1/employee/departments",Map.of("GET","view_departments_employee"));
     }
-    public Boolean isPermissionsUrl(List<String> permissions,String url){
-        String perm = listUrl.get(url);
+    public Boolean isPermissionsUrl(List<String> permissions,String url,String method){
+        String perm = listUrl.get(url).get(method);
         if(perm != null){
             return permissions.contains(perm);
         }

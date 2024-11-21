@@ -33,16 +33,21 @@ public class EmployeeController {
         return employeeService.getEmployeeActive();
     }
 // Admin
-    @GetMapping("/generateId")
-    public ResponseEntity<?> getIdempployee(){
-        return ResponseEntity.ok().body(
-                new ResponeObject(HttpStatus.OK.value(), "Generate id success",employeeService.generateEmployeeId()));
-    }
+//    @GetMapping("/generateId")
+//    public ResponseEntity<?> getIdempployee(){
+//        return ResponseEntity.ok().body(
+//                new ResponeObject(HttpStatus.OK.value(), "Generate id success",employeeService.generateEmployeeId()));
+//    }
 
 //    Admin and User
     @GetMapping("/{idEmployee}")
     public ResponseEntity<?> getIDEmployee(@PathVariable String idEmployee){
         return employeeService.getIDEmployee(idEmployee);
+    }
+
+    @GetMapping("/departments")
+    public ResponseEntity<?> getEmployeeDepartments(@RequestParam String department){
+        return employeeService.getEmployeeDepartments(department);
     }
 
     @GetMapping("/detail-salary/{idEmployee}")

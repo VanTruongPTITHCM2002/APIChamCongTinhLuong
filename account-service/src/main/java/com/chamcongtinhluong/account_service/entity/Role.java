@@ -20,7 +20,7 @@ public class Role {
     @Column(name = "rolename",length = 100)
     private String rolename;
 
-    @Column(name = "roledescription", length = 45)
+    @Column(name = "roledescription", length = 255)
     private String roleDescription;
 
     @Column(name = "create_at")

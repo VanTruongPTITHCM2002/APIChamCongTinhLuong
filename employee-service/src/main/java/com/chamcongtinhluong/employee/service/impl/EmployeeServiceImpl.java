@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -40,19 +41,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private  final DepartmentsRepository departmentsRepository;
     private  final GenerateID generateID;
 
-    @Override
-    public String generateEmployeeId() {
-        String sql = "SELECT MAX(idemployee) FROM employee";
-        String maxId = jdbcTemplate.queryForObject(sql, String.class);
-
-        if (maxId == null || maxId.isEmpty()) {
-            return "NV001";
-        }
-
-        int numericPart = Integer.parseInt(maxId.substring(2));
-        String newId = String.format("NV%03d", numericPart + 1);
-        return newId;
-    }
+//
 
     @Override
     public String getDetailSalary(String idemployee) {
@@ -62,24 +51,22 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ResponseEntity<?> getEmployeeActive() {
-        List<EmployeeResponse> employeeDTOList = employeeRepository.findAll().stream().filter(e->e.getStatus() == 1 && !e.getIdemployee().equals("NV001")).map(
-                e->
-//                        new EmployeeDTO(
-//                        e.getIdemployee(),
-//                        e.getFirstname(),
-//                        e.getLastname(),
-//                        e.getGender(),
-//                        e.getBirthdate(),
-//                        e.getCmnd(),
-//                        e.getEmail(),
-//                        e.getPhonenumber(),
-//                        e.getAddress(),
-//                        DegreeNumber.getStatusFromCode(e.getDegree().getIddegree()),
-//                        StatusEmployee.getStatusFromCode(e.getStatus())
-//
-//                )
-                EmployeeResponse.builder()
-                        .build()
+        //                        new EmployeeDTO(
+        //                        e.getIdemployee(),
+        //                        e.getFirstname(),
+        //                        e.getLastname(),
+        //                        e.getGender(),
+        //                        e.getBirthdate(),
+        //                        e.getCmnd(),
+        //                        e.getEmail(),
+        //                        e.getPhonenumber(),
+        //                        e.getAddress(),
+        //                        DegreeNumber.getStatusFromCode(e.getDegree().getIddegree()),
+        //                        StatusEmployee.getStatusFromCode(e.getStatus())
+        //
+        //                )
+        List<EmployeeResponse> employeeDTOList = employeeRepository.findAll().stream().filter(e->e.getStatus() == 1).map(
+                EmployeeMapper.INSTANCE::toResponse
         ).toList();
         return ResponseEntity.ok().body(new ResponeObject(HttpStatus.OK.value(),"Danh sách nhân viên",employeeDTOList));
 
@@ -134,11 +121,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public ResponseEntity<?> getEmployee() {
         try{
             List<EmployeeResponse> employeeDTOList = employeeRepository.findAll().stream()
-                    .filter(e->!e.getIdemployee().equals("NV001"))
                     .map(
                             EmployeeMapper.INSTANCE::toResponse
-//
-
                     ).toList();
 
             return ResponseEntity.ok().body(
@@ -156,6 +140,32 @@ public class EmployeeServiceImpl implements EmployeeService {
                             .build());
         }
 
+    }
+
+    @Override
+    public ResponseEntity<?> getEmployeeDepartments(String departments) {
+        try{
+            List<EmployeeResponse> employeeResponseList = employeeRepository
+                    .findAll().stream()
+                    .filter(e-> e.getDepartments().getDepartmentName().equals(departments))
+                    .map(
+                            EmployeeMapper.INSTANCE::toResponse
+                    ).toList();
+
+            return ResponseEntity.ok().body(
+                    ResponeObject.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("Lay thanh cong danh sach nhan vien phong " + departments)
+                            .data(employeeResponseList)
+                            .build()
+            );
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponeObject.builder()
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message("Loi ket noi den co so du lieu")
+                            .build());
+        }
     }
 
     @Override
@@ -188,7 +198,17 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setDegree(degreeRepository.findById(DegreeNumber.getCodeFromStatus(e.getDegree())).orElse(null));
             employee.setDepartments(departmentsRepository.findByDepartmentName(e.getDepartment()));
             employeeRepository.save(employee);
+
             accountServiceClient.createAccount(new CreateAccountRequest(employee.getIdemployee(),"1",2));
+            return ResponseEntity.status(
+                    HttpStatus.CREATED
+            ).body(ResponeObject
+                    .builder()
+                    .status(HttpStatus.CREATED.value())
+                    .message("Thêm nhân viên thành công")
+                            .data(employee.getIdemployee())
+                    .build()
+            );
         }catch (Exception exception){
             System.out.println(exception.getMessage());
                  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -199,14 +219,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
 
-        return ResponseEntity.status(
-                HttpStatus.CREATED
-        ).body(ResponeObject
-                .builder()
-                        .status(HttpStatus.CREATED.value())
-                        .message("Thêm nhân viên thành công")
-                .build()
-               );
+
     }
 
     @Override

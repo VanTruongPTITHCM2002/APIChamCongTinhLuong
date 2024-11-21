@@ -9,12 +9,12 @@ import java.io.IOException;
 
 public interface EmployeeService {
     public ResponseEntity<?> getEmployee();
+    public ResponseEntity<?> getEmployeeDepartments(String departments);
     public ResponseEntity<?> getIDEmployee(String id);
     public ResponseEntity<?> addEmployee(EmployeeRequest e);
     public ResponseEntity<?> updateEmployee(String idemployee,EmployeeRequest e);
     public ResponseEntity<?> updateStatusEmployee(String idemployee);
     public ResponseEntity<?> deleteEmployee(String idemployee);
-    public String generateEmployeeId();
     public String getDetailSalary(String idemployee);
     public ResponseEntity<?> getEmployeeActive();
     public ResponseEntity<?> countEmployee();

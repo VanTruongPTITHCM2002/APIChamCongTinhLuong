@@ -38,11 +38,11 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public ResponseEntity<?> getAccounts() {
         try{
-            List<AccountResponse> listAccount = roleRepository.findByRole("USER").stream()
+            List<AccountResponse> listAccount = accountRepository.findAll().stream().filter(acc->!acc.getRoles().getRolename().equals("ADMIN"))
                     .map(account ->
                             AccountResponse.builder()
                                     .username(account.getUsername())
-                                    .role("Nhân viên")
+                                    .role(account.getRoles().getRoleDescription())
                                     .status(convertStatus.convert(account.getStatus()))
                                     .build()
                     )
@@ -133,6 +133,10 @@ public class AccountServiceImpl implements AccountService {
         try{
             Account account = accountRepository.findByUsername(accountResponse.getUsername()).orElse(null);
             account.setStatus(convertStatus.convert(accountResponse.getStatus()));
+            if(!account.getRoles().getRoleDescription().equals(accountResponse.getRole())){
+                Role role = roleRepository.findByRoleDescription(accountResponse.getRole());
+                account.setRoles(role);
+            }
             accountRepository.save(account);
         }catch (NullPointerException nullPointerException){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -151,7 +155,7 @@ public class AccountServiceImpl implements AccountService {
         }
         return ResponseEntity.ok().body(ResponseObject.builder()
                         .status(HttpStatus.OK.value())
-                        .message("Sửa trạng thái tài khoản " + accountResponse.getUsername() + " thành công")
+                        .message("Sửa tài khoản " + accountResponse.getUsername() + " thành công")
                 .build());
     }
 

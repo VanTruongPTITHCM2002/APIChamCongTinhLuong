@@ -1,7 +1,9 @@
 package com.chamcontinhluong.apigateway.secuirty;
 
+import com.chamcontinhluong.apigateway.config.Config;
 import com.chamcontinhluong.apigateway.config.ListURL;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpMethod;
@@ -21,6 +23,7 @@ public class JwtAuthenticationFilter  implements GatewayFilter  {
 
     private final JwtService jwtService;
     private final ListURL listURL;
+
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -49,37 +52,16 @@ public class JwtAuthenticationFilter  implements GatewayFilter  {
             if ("ADMIN".equals(role)) {
                 return chain.filter(exchange);
             }
+            if(path.contains("change_password")){
+                return chain.filter(exchange);
+            }
 
-
-
-            // Kiểm tra quyền từ token
             List<String> permissions = jwtService.extractPermissionsFromToken(token);
-            Boolean checkPermissions = listURL.isPermissionsUrl(permissions,path);
-            // Kiểm tra quyền của phương thức và path
-//            if (!permissions.contains(requiredPermission)) {
-//                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-//                return exchange.getResponse().setComplete();
-//            }
+            Boolean checkPermissions = listURL.isPermissionsUrl(permissions,path,method.toString());
         if(!checkPermissions){
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             return exchange.getResponse().setComplete();
         }
-
-
-
-//            if (userPaths.stream().anyMatch(p-> p.startsWith(path)) && !role.equals("USER")) {
-//                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-//                return exchange.getResponse().setComplete();
-//            }
-
-//            if (adminPaths.stream().anyMatch(path::startsWith) && !role.equals("ADMIN")) {
-//                if(path.contains("change_password")){
-//                    return chain.filter(exchange);
-//                }
-//                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-//                return exchange.getResponse().setComplete();
-//            }
-
         } else {
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             return exchange.getResponse().setComplete();

@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 public interface EmployeeMapper {
     EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);
 
-    @Mapping(source = "idEmployee",target = "idemployee")
+//    @Mapping(source = "idEmployee",target = "idemployee")
     @Mapping(source = "firstName", target = "firstname")
     @Mapping(source = "lastName", target = "lastname")
     @Mapping(source = "birthDate", target = "birthdate")
@@ -22,7 +22,6 @@ public interface EmployeeMapper {
     @Mapping(target = "degree", ignore = true) // Tùy chỉnh thêm
     @Mapping(target = "departments", ignore = true)
     @Mapping(source = "position",target= "position")
-    @Mapping(source = "image",target = "image")
     @Mapping(target = "status", expression = "java(mapStatus(employeeRequest.getStatus()))")
     Employee toEntity(EmployeeRequest employeeRequest);
 
