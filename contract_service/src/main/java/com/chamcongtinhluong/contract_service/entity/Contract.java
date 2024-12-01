@@ -28,6 +28,9 @@ public class Contract {
     @Column(name="workingdays")
     private int workingdays;
 
+    @Column(name= "leavedays")
+    private int leavedays;
+
     @Column(name="startdate")
     @Temporal(TemporalType.DATE)
     private Date startdate;

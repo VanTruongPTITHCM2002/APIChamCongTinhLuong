@@ -1,14 +1,17 @@
 package com.chamcongtinhluong.payroll_service.service;
 
 import com.chamcongtinhluong.payroll_service.dto.request.PayrollRequest;
+import com.chamcongtinhluong.payroll_service.dto.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface PayrollService {
     public ResponseEntity<?>getListSalary();
+    ResponseEntity<ApiResponse> getListSalaryByMonthAndYear(int month,int year);
     public ResponseEntity<?>getPayrollByIdEmployee(String idemployee);
     public ResponseEntity<?>payrollEmployee(PayrollRequest payrollRequest);
+    public ResponseEntity<ApiResponse> payrollManyEmployee(List<PayrollRequest> payrollRequests);
     public ResponseEntity<?>getIdEmployee();
     public ResponseEntity<?>updatePayroll(PayrollRequest payrollRequest);
     public int totalPaymentInMonth(int month,int year);

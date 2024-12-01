@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter  implements GatewayFilter  {
 
 
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-
+        String permissionHeader = exchange.getRequest().getHeaders().getFirst("PERMISSIONS");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
@@ -57,7 +57,8 @@ public class JwtAuthenticationFilter  implements GatewayFilter  {
             }
 
             List<String> permissions = jwtService.extractPermissionsFromToken(token);
-            Boolean checkPermissions = listURL.isPermissionsUrl(permissions,path,method.toString());
+            boolean checkPermissions = permissions.contains(permissionHeader);
+            System.out.println(permissionHeader);
         if(!checkPermissions){
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             return exchange.getResponse().setComplete();

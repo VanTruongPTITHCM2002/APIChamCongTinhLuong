@@ -11,7 +11,7 @@ import com.chamcongtinhluong.rewardpunish_service.dto.response.RewardPunishRespo
 import com.chamcongtinhluong.rewardpunish_service.entity.RewardPunish;
 import com.chamcongtinhluong.rewardpunish_service.repository.RewardPunishRepository;
 import com.chamcongtinhluong.rewardpunish_service.service.RewardPunishService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,13 +21,11 @@ import java.util.Calendar;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RewardPunishServiceImpl implements RewardPunishService {
 
-    @Autowired
-    private RewardPunishRepository rewardPunishRepository;
-
-    @Autowired
-    private WorkScheduleServiceClient workScheduleServiceClient;
+    private final RewardPunishRepository rewardPunishRepository;
+    private final WorkScheduleServiceClient workScheduleServiceClient;
 
     @Override
     public ResponseEntity<?> getRewardPunish() {

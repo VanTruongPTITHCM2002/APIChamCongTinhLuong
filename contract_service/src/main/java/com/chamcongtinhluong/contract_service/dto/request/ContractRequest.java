@@ -15,6 +15,7 @@ public class ContractRequest {
     private String idemployee;
     private int basicsalary;
     private int workingdays;
+    private int leavedays;
     private Date startdate;
     private Date endate;
 }

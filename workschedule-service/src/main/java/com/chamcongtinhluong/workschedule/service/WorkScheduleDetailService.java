@@ -8,10 +8,11 @@ import java.util.Date;
 import java.util.List;
 
 public interface WorkScheduleDetailService {
-    public ResponseEntity<?> getWorkScheduleDetail();
-    public ResponseEntity<?> getWorkScheduleDetailById(String idemeployee);
-    public ResponseEntity<?> addWorkScheduleManyEmployee(ListEmployeeRequest listEmployeeRequest);
-    public ResponseEntity<?> updateWorkScheduleDetail(String idemployee, WorkScheduleDetailRequest workScheduleDetailRequest);
-    public ResponseEntity<?> deleteWorkScheduleDetail(String idemployee, Date date);
+    ResponseEntity<?> getWorkScheduleDetail();
+    ResponseEntity<?> getWorkScheduleDetailById(String idemeployee);
+    ResponseEntity<?> addWorkScheduleManyEmployee(ListEmployeeRequest listEmployeeRequest);
+    ResponseEntity<?> updateWorkScheduleDetail(String idemployee, WorkScheduleDetailRequest workScheduleDetailRequest);
+    ResponseEntity<?> deleteWorkScheduleDetail(String idemployee, Date date);
+    ResponseEntity<?> deleteWorkScheduleManyEmployee(ListEmployeeRequest listEmployeeRequest);
     Boolean getWorkScheduleByIdAndDate(String idemployee,Date date);
 }

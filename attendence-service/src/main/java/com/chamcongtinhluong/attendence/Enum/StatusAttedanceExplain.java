@@ -1,5 +1,8 @@
 package com.chamcongtinhluong.attendence.Enum;
 
+import lombok.Getter;
+
+@Getter
 public enum StatusAttedanceExplain {
     DANG_CHO_DUYET("Đang chờ duyệt", 0),
     DUYET("Duyệt", 1),
@@ -13,13 +16,7 @@ public enum StatusAttedanceExplain {
         this.code = code;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
-    public int getCode() {
-        return code;
-    }
 
     public static int getCodeFromStatus(String status) {
         for (StatusAttedanceExplain s : StatusAttedanceExplain.values()) {

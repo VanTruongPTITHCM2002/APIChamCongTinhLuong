@@ -15,6 +15,7 @@ public class ContractResponse {
     private String idemployee;
     private int basicsalary;
     private int workingdays;
+    private int leavedays;
     private Date startdate;
     private Date endate;
     private String status;

@@ -13,6 +13,7 @@ import com.chamcongtinhluong.workschedule.entity.WorkSchedule;
 import com.chamcongtinhluong.workschedule.entity.WorkScheduleDetails;
 import com.chamcongtinhluong.workschedule.repository.WorkScheduleDetailsRepository;
 import com.chamcongtinhluong.workschedule.service.WorkScheduleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,18 +26,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class WorkScheduleImpl implements WorkScheduleService {
-    @Autowired
-    private WorkScheduleRepository workScheduleRepository;
 
-    @Autowired
-    private EmployeeServiceClient employeeServiceClient;
-
-    @Autowired
-    private WorkScheduleDetailsRepository workScheduleDetailsRepository;
-
-    @Autowired
-    private ContractServiceClient contractServiceClient;
+    private final WorkScheduleRepository workScheduleRepository;
+    private final EmployeeServiceClient employeeServiceClient;
+    private final WorkScheduleDetailsRepository workScheduleDetailsRepository;
+    private final ContractServiceClient contractServiceClient;
 
     @Override
     public ResponseEntity<?> getWorkSchedule() {
@@ -60,9 +56,9 @@ public class WorkScheduleImpl implements WorkScheduleService {
            LinkedHashMap employeeResponse = (LinkedHashMap) response.getBody();
             LinkedHashMap employee = (LinkedHashMap) employeeResponse.get("data");
             EmployeeClient employeeClient = new EmployeeClient();
-            employeeClient.setIdemployee(employee.get("idemployee").toString());
-            employeeClient.setFirstname(employee.get("firstname").toString());
-            employeeClient.setLastname(employee.get("lastname").toString());
+            employeeClient.setIdemployee(employee.get("idEmployee").toString());
+            employeeClient.setFirstname(employee.get("firstName").toString());
+            employeeClient.setLastname(employee.get("lastName").toString());
             return ResponseEntity.ok().body(employeeClient);
     }
         return ResponseEntity.ok().body(null);
@@ -78,7 +74,7 @@ public class WorkScheduleImpl implements WorkScheduleService {
             for(int i = 0 ; i < employee.size();i++){
                 LinkedHashMap linkedHashMap = (LinkedHashMap) employee.get(i);
                 IDEmployeeClient idEmployeeClient = new IDEmployeeClient();
-                idEmployeeClient.setId(linkedHashMap.get("idemployee").toString());
+                idEmployeeClient.setId(linkedHashMap.get("idEmployee").toString());
                 idEmployeeClientList.add(idEmployeeClient);
             }
 
@@ -99,7 +95,7 @@ public class WorkScheduleImpl implements WorkScheduleService {
         }
 
         WorkScheduleDetails workScheduleDetails = new WorkScheduleDetails();
-        workScheduleDetails.setEmployeeWorkScheduleId(new EmployeeWorkScheduleId(workSchedule.getIdwork_schedule(),workScheduleDetailRequest.getIdemployee()));
+        workScheduleDetails.setEmployeeWorkScheduleId(new EmployeeWorkScheduleId(workSchedule.getIdwork_schedule(),workScheduleDetailRequest.getIdEmployee()));
         workScheduleDetails.setWorkSchedule(workSchedule);
         List<WorkScheduleDetails> isExits = workScheduleDetailsRepository.findAll().stream().filter(
                 e->(e.getEmployeeWorkScheduleId().getWorkschedule() == workScheduleDetails.getEmployeeWorkScheduleId().getWorkschedule() &&
@@ -119,12 +115,11 @@ public class WorkScheduleImpl implements WorkScheduleService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.builder().status(HttpStatus.NOT_FOUND.value()).message("Không có lịch làm việc trong ngày này").data("").build());
         }
         List<WorkScheduleDetails> workScheduleDetailsList = workScheduleDetailsRepository.findAll().stream().filter(e->e.getEmployeeWorkScheduleId().getWorkschedule() == workSchedule.getIdwork_schedule()).toList();
-        List<WorkScheduleDetailRequest> workScheduleDetailRequestList = workScheduleDetailsList.stream().map(e-> new WorkScheduleDetailRequest(e.getEmployeeWorkScheduleId().getIdemployee(),"",e.getWorkSchedule().getWorkdate(), e.getWorkSchedule().getStartime(), e.getWorkSchedule().getEndtime())).toList();
+        List<WorkScheduleDetailRequest> workScheduleDetailRequestList = workScheduleDetailsList.stream().map(e-> new WorkScheduleDetailRequest(e.getEmployeeWorkScheduleId().getIdemployee(),e.getWorkSchedule().getWorkdate(), e.getWorkSchedule().getStartime(), e.getWorkSchedule().getEndtime())).toList();
         for(WorkScheduleDetailRequest workScheduleDetailRequest: workScheduleDetailRequestList){
-            ResponseEntity<?> response = employeeServiceClient.getIDEmployee(workScheduleDetailRequest.getIdemployee());
+            ResponseEntity<?> response = employeeServiceClient.getIDEmployee(workScheduleDetailRequest.getIdEmployee());
             LinkedHashMap employeeResponse = (LinkedHashMap) response.getBody();
             LinkedHashMap employee = (LinkedHashMap) employeeResponse.get("data");
-            workScheduleDetailRequest.setName(employee.get("firstname").toString() + " " + employee.get("lastname").toString());
         }
         return ResponseEntity.ok().body(workScheduleDetailRequestList);
     }

@@ -20,9 +20,6 @@ public class AttendanceExplain {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idattendance_explain;
 
-    @Column(name="idemployee",length = 45)
-    private String idemployee;
-
     @ManyToOne
     @JoinColumn(name="idattendance")
     private Attendance attendance;

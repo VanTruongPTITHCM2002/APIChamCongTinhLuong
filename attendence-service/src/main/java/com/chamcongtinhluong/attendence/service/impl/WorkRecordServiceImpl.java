@@ -133,7 +133,7 @@ public class WorkRecordServiceImpl implements WorkRecordService {
             for(int i = 0 ; i < employee.size();i++){
                 LinkedHashMap linkedHashMap = (LinkedHashMap) employee.get(i);
                 IdEmployeeClient idEmployeeClient = new IdEmployeeClient();
-                idEmployeeClient.setIdemployee(linkedHashMap.get("idemployee").toString());
+                idEmployeeClient.setIdemployee(linkedHashMap.get("idEmployee").toString());
                 idEmployeeClientList.add(idEmployeeClient);
             }
             idEmployeeClientList = idEmployeeClientList.stream().filter(

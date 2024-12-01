@@ -10,7 +10,7 @@ import com.chamcongtinhluong.payroll_service.dto.response.*;
 import com.chamcongtinhluong.payroll_service.entity.Payroll;
 import com.chamcongtinhluong.payroll_service.repository.PayrollRepository;
 import com.chamcongtinhluong.payroll_service.service.PayrollService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,50 +18,85 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class PayrollServiceImpl implements PayrollService {
 
-    @Autowired
-    private PayrollRepository payrollRepository;
-
-    @Autowired
-    DetailSalaryServiceClient detailSalaryServiceClient;
-
-    @Autowired
-    DayWorkServiceClient dayWorkServiceClient;
-
-    @Autowired
-    IdEmployeeServiceClient idEmployeeServiceClient;
-
-    @Autowired
-    PayrollContractClient payrollContractClient;
-
-    @Autowired
-    RewardPunishPayrollClient rewardPunishPayrollClient;
+    private final PayrollRepository payrollRepository;
+    private final DetailSalaryServiceClient detailSalaryServiceClient;
+    private final DayWorkServiceClient dayWorkServiceClient;
+    private final IdEmployeeServiceClient idEmployeeServiceClient;
+    private final PayrollContractClient payrollContractClient;
+    private final RewardPunishPayrollClient rewardPunishPayrollClient;
 
 
 
     @Override
     public ResponseEntity<?> getListSalary() {
-        List<PayrollResponse> responses= payrollRepository.findAll().stream().map(
-                e->new PayrollResponse(e.getIdemployee()
-                ,e.getName()
-                ,e.getMonth()
-                ,e.getYear()
-                ,e.getReward()
-                ,e.getPunish()
-               ,e.getBasicsalary()
-                        ,e.getDay_work()
-                        ,e.getDatecreated()
-                ,e.getTotalpayment()
+        try{
+            List<PayrollResponse> responses= payrollRepository.findAll().stream().map(
+                            e-> PayrollResponse.builder()
+                                    .idEmployee(e.getIdemployee())
+                                    .month(e.getMonth())
+                                    .year(e.getYear())
+                                    .reward(e.getReward())
+                                    .punish(e.getPunish())
+                                    .day_work(e.getDay_work())
+                                    .createDate(e.getDatecreated())
+                                    .totalPayment(e.getTotalpayment())
+                                    .basicSalary(e.getBasicsalary())
+                                    .status(StatusPayroll.getStatusFromCode(e.getStatus()))
+                                    .build()
+                    )
+                    .toList();
+            return ResponseEntity.ok().body(
+                    ApiResponse.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("Lấy thành công bảng lương")
+                            .data(responses).build()
+            );
+        }catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.builder()
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message("Loi ket noi den co so du lieu")
+                            .build());
+        }
 
-                ,StatusPayroll.getStatusFromCode(e.getStatus()))
-        ).toList();
-        return ResponseEntity.ok().body(
-                ApiResponse.builder()
-                        .status(HttpStatus.OK.value())
-                        .message("Lấy thành công bảng lương")
-                        .data(responses).build()
-        );
+
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse> getListSalaryByMonthAndYear(int month, int year) {
+        try{
+            List<PayrollResponse> responses= payrollRepository.findAll().stream()
+                    .filter(e->e.getMonth() == month && e.getYear() == year)
+                    .map(
+                            e-> PayrollResponse.builder()
+                                    .idEmployee(e.getIdemployee())
+                                    .month(e.getMonth())
+                                    .year(e.getYear())
+                                    .reward(e.getReward())
+                                    .punish(e.getPunish())
+                                    .day_work(e.getDay_work())
+                                    .createDate(e.getDatecreated())
+                                    .totalPayment(e.getTotalpayment())
+                                    .status(StatusPayroll.getStatusFromCode(e.getStatus()))
+                                    .build()
+                    )
+                    .toList();
+            return ResponseEntity.ok().body(
+                    ApiResponse.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("Lấy thành công bảng lương")
+                            .data(responses).build()
+            );
+        }catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.builder()
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message("Loi ket noi den co so du lieu")
+                            .build());
+        }
     }
 
     @Override
@@ -74,16 +109,15 @@ public class PayrollServiceImpl implements PayrollService {
                         e.getIdemployee().equals(idemployee))
                 .map(e->
                         PayrollResponse.builder()
-                                .idemployee(e.getIdemployee())
-                                .name(e.getName())
+                                .idEmployee(e.getIdemployee())
                                 .month(e.getMonth())
                                 .year(e.getYear())
-                                .basicsalary(e.getBasicsalary())
+                                .basicSalary(e.getBasicsalary())
                                 .reward(e.getReward())
                                 .punish(e.getPunish())
-                                .datecreated(e.getDatecreated())
+                                .createDate(e.getDatecreated())
                                 .day_work(e.getDay_work())
-                                .totalpayment(e.getTotalpayment())
+                                .totalPayment(e.getTotalpayment())
                                 .status(StatusPayroll.getStatusFromCode(e.getStatus()))
                                 .build()
                 ).toList();
@@ -98,7 +132,7 @@ public class PayrollServiceImpl implements PayrollService {
     @Override
     public ResponseEntity<?> payrollEmployee(PayrollRequest payrollRequest) {
 
-        Payroll payrollCheck = payrollRepository.findByIdemployeeAndMonthAndYear(payrollRequest.getIdemployee(),payrollRequest.getMonth(),payrollRequest.getYear());
+        Payroll payrollCheck = payrollRepository.findByIdemployeeAndMonthAndYear(payrollRequest.getIdEmployee(),payrollRequest.getMonth(),payrollRequest.getYear());
 
         if(payrollCheck != null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder()
@@ -112,33 +146,33 @@ public class PayrollServiceImpl implements PayrollService {
         DayWorkResponse dayWorkResponse = new DayWorkResponse();
         ResponseEntity<?> response = null;
         PayrollContractResponse payrollContractResponse = payrollContractClient.getContractByIdMonthYear(
-                PayrollContractRequest.builder().idemployee(payrollRequest.getIdemployee()).month(payrollRequest.getMonth()).year(
+                PayrollContractRequest.builder().idemployee(payrollRequest.getIdEmployee()).month(payrollRequest.getMonth()).year(
                         payrollRequest.getYear()
                 ).build()
         );
         if (payrollContractResponse == null) {
         return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder()
                     .status(HttpStatus.BAD_REQUEST.value())
-                    .message("Không thể tính lương do nhân viên " + payrollRequest.getIdemployee() + " không có hợp đồng tháng " + payrollRequest.getMonth())
+                    .message("Không thể tính lương do nhân viên " + payrollRequest.getIdEmployee() + " không có hợp đồng tháng " + payrollRequest.getMonth())
                     .data("")
                     .build());
         }
 
         List<RewardPunishPayrollResponse> rewardPunishPayrollResponseList = rewardPunishPayrollClient.getRewardPunishForCalSalary(
                 RewardPunishPayrollRequest.builder()
-                        .idemployee(payrollRequest.getIdemployee())
+                        .idemployee(payrollRequest.getIdEmployee())
                         .month(payrollRequest.getMonth())
                         .year(payrollRequest.getYear())
                         .build()
         );
 
-        String name =  detailSalaryServiceClient.getDetailSalary(payrollRequest.getIdemployee());
+        String name =  detailSalaryServiceClient.getDetailSalary(payrollRequest.getIdEmployee());
 
         DayWorkRequest dayWorkRequest = new DayWorkRequest();
 
         try{
             response = dayWorkServiceClient.getDayWork(DayWorkRequest.builder()
-                    .idemployee(payrollRequest.getIdemployee())
+                    .idemployee(payrollRequest.getIdEmployee())
                     .month(payrollRequest.getMonth())
                     .year(payrollRequest.getYear())
                     .build());
@@ -169,7 +203,6 @@ public class PayrollServiceImpl implements PayrollService {
             dayWorkResponse.setMonth(Integer.parseInt( employee.get("month").toString()));
             dayWorkResponse.setYear(Integer.parseInt( employee.get("year").toString()));
             dayWorkResponse.setDay_work(Float.parseFloat(employee.get("day_work").toString()));
-
         }
 
         int rewardCash = rewardPunishPayrollResponseList.stream()
@@ -182,12 +215,12 @@ public class PayrollServiceImpl implements PayrollService {
                 .sum();
 
         Payroll payroll = new Payroll();
-        payroll.setIdemployee(payrollRequest.getIdemployee());
+        payroll.setIdemployee(payrollRequest.getIdEmployee());
         payroll.setMonth(payrollRequest.getMonth());
         payroll.setYear(payrollRequest.getYear());
         payroll.setReward(rewardCash);
         payroll.setPunish(punishCash);
-        payroll.setName(name);
+//        payroll.setName(name);
         payroll.setStatus(StatusPayroll.getCodeFromStatus(payrollRequest.getStatus()));
         payroll.setDatecreated(payrollRequest.getDatecreated());
         payroll.setDay_work(dayWorkResponse.getDay_work());
@@ -195,19 +228,25 @@ public class PayrollServiceImpl implements PayrollService {
         payroll.setTotalpayment(((dayWorkResponse.getDay_work() * payrollContractResponse.getBasicsalary())/ payrollContractResponse.getDayworks() )+ rewardCash - punishCash);
         payrollRepository.save(payroll);
 
-        payrollContractClient.changeStatusContract(payrollRequest.getIdemployee(),payrollRequest.getMonth(),payrollRequest.getYear());
+        payrollContractClient.changeStatusContract(payrollRequest.getIdEmployee(),payrollRequest.getMonth(),payrollRequest.getYear());
       return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.builder()
               .status(HttpStatus.CREATED.value())
               .message("Tính lương thành công")
               .data(        PayrollResponse
-          .builder().idemployee(payroll.getIdemployee()).month(payroll.getMonth()).year(payroll.getYear())
-               .reward(rewardCash).punish(punishCash).name(name).status(StatusPayroll.getStatusFromCode(payroll.getStatus()))
-               .datecreated(payrollRequest.getDatecreated())
+          .builder().idEmployee(payroll.getIdemployee()).month(payroll.getMonth()).year(payroll.getYear())
+               .reward(rewardCash).punish(punishCash).status(StatusPayroll.getStatusFromCode(payroll.getStatus()))
+               .createDate(payrollRequest.getDatecreated())
                .day_work(payroll.getDay_work())
-               .basicsalary(payroll.getBasicsalary())
-              .totalpayment(payroll.getTotalpayment()).build())
+               .basicSalary(payroll.getBasicsalary())
+              .totalPayment(payroll.getTotalpayment()).build())
 
               .build());
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse> payrollManyEmployee(List<PayrollRequest> payrollRequests) {
+
+        return null;
     }
 
     @Override
@@ -220,7 +259,7 @@ public class PayrollServiceImpl implements PayrollService {
             for(int i = 0 ; i < employee.size();i++){
                 LinkedHashMap linkedHashMap = (LinkedHashMap) employee.get(i);
                 IdEmployeeResponse idEmployeeClient = new IdEmployeeResponse();
-                idEmployeeClient.setIdemployee(linkedHashMap.get("idemployee").toString());
+                idEmployeeClient.setIdemployee(linkedHashMap.get("idEmployee").toString());
                 idEmployeeClientList.add(idEmployeeClient);
             }
             idEmployeeClientList = idEmployeeClientList.stream().filter(
@@ -233,7 +272,7 @@ public class PayrollServiceImpl implements PayrollService {
 
     @Override
     public ResponseEntity<?> updatePayroll(PayrollRequest payrollRequest) {
-        Payroll payrollCheck = payrollRepository.findByIdemployeeAndMonthAndYear(payrollRequest.getIdemployee(),payrollRequest.getMonth(),payrollRequest.getYear());
+        Payroll payrollCheck = payrollRepository.findByIdemployeeAndMonthAndYear(payrollRequest.getIdEmployee(),payrollRequest.getMonth(),payrollRequest.getYear());
         if (payrollCheck == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     ApiResponse.builder().status(HttpStatus.BAD_REQUEST.value())

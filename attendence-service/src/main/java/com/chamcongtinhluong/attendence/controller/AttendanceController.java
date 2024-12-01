@@ -4,6 +4,7 @@ import com.chamcongtinhluong.attendence.dto.request.AttendanceRequest;
 import com.chamcongtinhluong.attendence.dto.request.IdEmployeeRequest;
 import com.chamcongtinhluong.attendence.dto.response.AttendanceResponse;
 import com.chamcongtinhluong.attendence.service.AttendanceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +14,10 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/api/v1/attendance")
+@RequiredArgsConstructor
 public class AttendanceController {
 
-    @Autowired
-    AttendanceService attendanceService;
+   private final AttendanceService attendanceService;
 
 //    ADMIN
     @GetMapping
@@ -24,9 +25,9 @@ public class AttendanceController {
         return attendanceService.getAttendance();
     }
 //USER
-    @GetMapping("/{idemployee}")
-    private ResponseEntity<?>getAttendanceById(@PathVariable String idemployee){
-        return attendanceService.getAttendanceById(idemployee);
+    @GetMapping("/{idEmployee}")
+    private ResponseEntity<?>getAttendanceById(@PathVariable String idEmployee){
+        return attendanceService.getAttendanceById(idEmployee);
     }
 //ADMIN
     @GetMapping("/countDate")
@@ -52,7 +53,7 @@ public class AttendanceController {
     }
 //ADMIN
     @PutMapping("/admin")
-    private  ResponseEntity<?>updateAttedanceByAdmin(@RequestBody AttendanceRequest attendanceRequest) throws ParseException{
+    private  ResponseEntity<?>updateAttendanceByAdmin(@RequestBody AttendanceRequest attendanceRequest) throws ParseException{
         return attendanceService.updateAttendanceByAdmin(attendanceRequest);
     }
 

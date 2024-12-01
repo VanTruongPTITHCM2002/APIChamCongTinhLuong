@@ -14,9 +14,8 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class WorkScheduleDetailRequest {
-    private String idemployee;
-    private String name;
+    private String idEmployee;
     private Date workdate;
-    private LocalTime startime;
-    private LocalTime endtime;
+    private LocalTime startTime;
+    private LocalTime endTime;
 }

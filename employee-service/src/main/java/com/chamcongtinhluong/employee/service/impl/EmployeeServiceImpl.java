@@ -44,28 +44,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 //
 
     @Override
-    public String getDetailSalary(String idemployee) {
-        Employee employee = employeeRepository.findByIdemployee(idemployee);
+    public String getDetailSalary(String idEmployee) {
+        Employee employee = employeeRepository.findByIdemployee(idEmployee);
         return employee.getFirstname() + ' ' + employee.getLastname();
     }
 
     @Override
     public ResponseEntity<?> getEmployeeActive() {
-        //                        new EmployeeDTO(
-        //                        e.getIdemployee(),
-        //                        e.getFirstname(),
-        //                        e.getLastname(),
-        //                        e.getGender(),
-        //                        e.getBirthdate(),
-        //                        e.getCmnd(),
-        //                        e.getEmail(),
-        //                        e.getPhonenumber(),
-        //                        e.getAddress(),
-        //                        DegreeNumber.getStatusFromCode(e.getDegree().getIddegree()),
-        //                        StatusEmployee.getStatusFromCode(e.getStatus())
-        //
-        //                )
-        List<EmployeeResponse> employeeDTOList = employeeRepository.findAll().stream().filter(e->e.getStatus() == 1).map(
+        List<EmployeeResponse> employeeDTOList = employeeRepository.findAll().stream().filter(e->e.getStatus() == 1
+            && contractEmployeeServiceClient.checkEmployee(e.getIdemployee())
+        ).map(
                 EmployeeMapper.INSTANCE::toResponse
         ).toList();
         return ResponseEntity.ok().body(new ResponeObject(HttpStatus.OK.value(),"Danh sách nhân viên",employeeDTOList));
@@ -174,19 +162,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(emp == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponeObject(HttpStatus.NOT_FOUND.value(), "Not found employee"+ id,""));
         }
-        EmployeeResponse employeeResponse = new EmployeeResponse();
-//        employeeDTO.setIdemployee(emp.getIdemployee());
-//        employeeDTO.setFirstname(emp.getFirstname());
-//        employeeDTO.setLastname(emp.getLastname());
-//        employeeDTO.setGender(emp.getGender());
-//        employeeDTO.setEmail(emp.getEmail());
-//        employeeDTO.setBirthdate(emp.getBirthdate());
-//        employeeDTO.setAddress(emp.getAddress());
-//        employeeDTO.setStatus(StatusEmployee.getStatusFromCode(emp.getStatus()));
-//        employeeDTO.setPhonenumber(emp.getPhonenumber());
-//        employeeDTO.setCmnd(emp.getCmnd());
-//        employeeDTO.setDegree(DegreeNumber.getStatusFromCode(emp.getDegree().getIddegree()));
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponeObject(HttpStatus.OK.value(), "Get employee successs "+ id,null));
+        EmployeeResponse employeeResponse = EmployeeMapper.INSTANCE.toResponse(emp);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponeObject(HttpStatus.OK.value(), "Get employee successs "+ id,employeeResponse));
     }
 
     @Override

@@ -46,4 +46,10 @@ public class WorkScheduleDetailController {
     private ResponseEntity<?>deleteWorkScheduleDetail(@RequestParam String idemployee,@RequestParam Date date){
         return workScheduleDetailService.deleteWorkScheduleDetail(idemployee, date);
     }
+
+    @PostMapping("/delete-employees")
+    private ResponseEntity<?> deleteManyEmployeeWorkScheduleDetail(@RequestBody ListEmployeeRequest listEmployeeRequest){
+        return workScheduleDetailService.deleteWorkScheduleManyEmployee(listEmployeeRequest);
+    }
+
 }

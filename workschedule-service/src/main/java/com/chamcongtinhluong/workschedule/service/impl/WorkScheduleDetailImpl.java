@@ -10,6 +10,7 @@ import com.chamcongtinhluong.workschedule.entity.WorkScheduleDetails;
 import com.chamcongtinhluong.workschedule.repository.WorkScheduleDetailsRepository;
 import com.chamcongtinhluong.workschedule.repository.WorkScheduleRepository;
 import com.chamcongtinhluong.workschedule.service.WorkScheduleDetailService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +21,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class WorkScheduleDetailImpl implements WorkScheduleDetailService {
 
-    @Autowired
-    private WorkScheduleDetailsRepository workScheduleDetailsRepository;
-
-    @Autowired
-    private WorkScheduleRepository workScheduleRepository;
-
-    @Autowired
-    private EmployeeServiceClient employeeServiceClient;
+    private final WorkScheduleDetailsRepository workScheduleDetailsRepository;
+    private final WorkScheduleRepository workScheduleRepository;
+    private final EmployeeServiceClient employeeServiceClient;
 
     @Override
     public ResponseEntity<?> getWorkScheduleDetail() {
@@ -38,7 +35,7 @@ public class WorkScheduleDetailImpl implements WorkScheduleDetailService {
                 .stream().map(
                         workScheduleDetails ->
                                 WorkScheduleDetailRequest.builder()
-                                        .idemployee(workScheduleDetails.getEmployeeWorkScheduleId().getIdemployee())
+                                        .idEmployee(workScheduleDetails.getEmployeeWorkScheduleId().getIdemployee())
                                         .workdate(workScheduleDetails.getWorkSchedule().getWorkdate())
                                         .build()
                 ).toList();
@@ -55,7 +52,7 @@ public class WorkScheduleDetailImpl implements WorkScheduleDetailService {
         List<WorkScheduleDetailRequest> workScheduleDetailRequestList = workScheduleDetailsRepository
                 .findAll().stream().filter(workScheduleDetails -> workScheduleDetails.getEmployeeWorkScheduleId()
                         .getIdemployee().equals(idemeployee))
-                .map(e-> new WorkScheduleDetailRequest(e.getEmployeeWorkScheduleId().getIdemployee(),"",e.getWorkSchedule().getWorkdate(), e.getWorkSchedule().getStartime(), e.getWorkSchedule().getEndtime())).toList();
+                .map(e-> new WorkScheduleDetailRequest(e.getEmployeeWorkScheduleId().getIdemployee(),e.getWorkSchedule().getWorkdate(), e.getWorkSchedule().getStartime(), e.getWorkSchedule().getEndtime())).toList();
         if(workScheduleDetailRequestList.isEmpty()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     ApiResponse.builder()
@@ -64,10 +61,9 @@ public class WorkScheduleDetailImpl implements WorkScheduleDetailService {
                             .data(workScheduleDetailRequestList).build());
         }
         for(WorkScheduleDetailRequest workScheduleDetailRequest: workScheduleDetailRequestList){
-            ResponseEntity<?> response = employeeServiceClient.getIDEmployee(workScheduleDetailRequest.getIdemployee());
+            ResponseEntity<?> response = employeeServiceClient.getIDEmployee(workScheduleDetailRequest.getIdEmployee());
             LinkedHashMap employeeResponse = (LinkedHashMap) response.getBody();
             LinkedHashMap employee = (LinkedHashMap) employeeResponse.get("data");
-            workScheduleDetailRequest.setName(employee.get("firstname").toString() + " " + employee.get("lastname").toString());
         }
         return ResponseEntity.ok().body(
                 ApiResponse.builder()
@@ -128,7 +124,7 @@ public class WorkScheduleDetailImpl implements WorkScheduleDetailService {
         workScheduleDetailsRepository.delete(workScheduleDetails);
         WorkScheduleDetails workScheduleDetails1 = new WorkScheduleDetails();
 
-        workScheduleDetails1.setEmployeeWorkScheduleId(new EmployeeWorkScheduleId(workSchedule.getIdwork_schedule(),workScheduleDetailRequest.getIdemployee()));
+        workScheduleDetails1.setEmployeeWorkScheduleId(new EmployeeWorkScheduleId(workSchedule.getIdwork_schedule(),workScheduleDetailRequest.getIdEmployee()));
         workScheduleDetails1.setWorkSchedule(workSchedule);
         workScheduleDetailsRepository.save(workScheduleDetails1);
          return ResponseEntity.ok().body(
@@ -168,6 +164,23 @@ public class WorkScheduleDetailImpl implements WorkScheduleDetailService {
                         .message("Xóa thành công nhân viên trong lịch làm việc")
                         .data("").build()
         );
+    }
+
+    @Override
+    public ResponseEntity<?> deleteWorkScheduleManyEmployee(ListEmployeeRequest listEmployeeRequest) {
+        WorkSchedule workSchedule = workScheduleRepository.findByWorkdate(listEmployeeRequest.getDateWork());
+        if(workSchedule == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().status(HttpStatus.BAD_REQUEST.value()).message("Lịch làm việc không tồn tại").data("").build());
+        }
+        for(String idEmployee : listEmployeeRequest.getListEmployee()) {
+            WorkScheduleDetails workScheduleDetails = workScheduleDetailsRepository.findByEmployeeWorkScheduleIdWorkscheduleAndEmployeeWorkScheduleIdIdemployee(workSchedule.getIdwork_schedule(),idEmployee);
+            workScheduleDetailsRepository.delete(workScheduleDetails);
+        }
+        return ResponseEntity.ok().body(
+                ApiResponse.builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Xóa thành công nhân viên trong lịch làm việc")
+                        .data("").build());
     }
 
     @Override

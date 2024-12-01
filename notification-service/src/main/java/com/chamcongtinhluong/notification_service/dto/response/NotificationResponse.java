@@ -21,6 +21,6 @@ public class NotificationResponse {
     private String content;
     private String type;
     private String status;
-    private Date createAt;
-    private Date updateAt;
+    private String createAt;
+    private String updateAt;
 }

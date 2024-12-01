@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class PayrollRequest {
-    private String idemployee;
+    private String idEmployee;
     private int month;
     private int year;
     @Temporal(TemporalType.DATE)

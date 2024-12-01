@@ -13,6 +13,7 @@ import com.chamcongtinhluong.attendence.repository.AttendanceRepository;
 import com.chamcongtinhluong.attendence.repository.AttendanceStatusRepository;
 import com.chamcongtinhluong.attendence.repository.WorkRecordRepository;
 import com.chamcongtinhluong.attendence.service.AttendanceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,19 +26,13 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AttendanceServiceImpl implements AttendanceService {
 
-    @Autowired
-    AttendanceRepository attendanceRepository;
-
-    @Autowired
-    AttendanceStatusRepository attendanceStatusRepository;
-
-    @Autowired
-    WorkRecordRepository workRecordRepository;
-
-    @Autowired
-    WorkScheduleServiceClient workScheduleServiceClient;
+    private final AttendanceRepository attendanceRepository;
+    private final AttendanceStatusRepository attendanceStatusRepository;
+    private final WorkRecordRepository workRecordRepository;
+    private final WorkScheduleServiceClient workScheduleServiceClient;
 
     public static String formatTime(Time time) {
         if(time == null){
@@ -66,7 +61,9 @@ public class AttendanceServiceImpl implements AttendanceService {
                                 e.getNumberwork()
                         )
                 ).toList();
-        return ResponseEntity.ok().body(ApiResponse.builder().status(HttpStatus.OK.value()).message("Lấy dữ liệu chấm công thành công").data(attendanceResponseList).build());
+        return ResponseEntity.ok().body(ApiResponse.builder()
+                .status(HttpStatus.OK.value()).message("Lấy dữ liệu chấm công thành công")
+                .data(attendanceResponseList).build());
     }
 
     @Override

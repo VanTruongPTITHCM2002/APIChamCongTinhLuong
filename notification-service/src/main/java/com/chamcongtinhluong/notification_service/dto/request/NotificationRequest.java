@@ -1,5 +1,6 @@
 package com.chamcongtinhluong.notification_service.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +30,8 @@ public class NotificationRequest {
     @NotEmpty(message = "Vui long khong de trong chu de thong bao")
     private String type;
     private String status;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private Date createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private Date updateAt;
 }

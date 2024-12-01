@@ -2,7 +2,7 @@ package com.chamcongtinhluong.payroll_service.controller;
 
 import com.chamcongtinhluong.payroll_service.dto.request.PayrollRequest;
 import com.chamcongtinhluong.payroll_service.service.PayrollService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,10 +11,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/payroll")
+@RequiredArgsConstructor
 public class PayrollController {
 
-    @Autowired
-    PayrollService payrollService;
+    private final PayrollService payrollService;
 
     @GetMapping
     private ResponseEntity<?> getPayRolls(){

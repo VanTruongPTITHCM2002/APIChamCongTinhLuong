@@ -23,4 +23,9 @@ public class NotificationController {
     private ResponseEntity<?> addNotification(@RequestBody @Validated NotificationRequest notificationRequest){
         return notificationService.addNotification(notificationRequest);
     }
+
+    @DeleteMapping
+    private ResponseEntity<?> deleteNotification(@RequestBody @Validated NotificationRequest notificationRequest){
+        return notificationService.deleteNotification(notificationRequest);
+    }
 }

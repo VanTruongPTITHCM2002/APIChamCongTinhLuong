@@ -33,7 +33,7 @@ public class AttendanceExplainServiceImpl implements AttendanceExplainService {
         List<AttedanceExplainResponse> attedanceExplainResponses = attendanceExplainRepository.findAll()
                 .stream().map(e->
                         new AttedanceExplainResponse(
-                                e.getIdemployee(),
+                                e.getAttendance().getIdemployee(),
                                 e.getAttendance().getDateattendance(),
                                 e.getAttendance().getCheckintime(),
                                 e.getAttendance().getCheckouttime(),
@@ -64,7 +64,6 @@ public class AttendanceExplainServiceImpl implements AttendanceExplainService {
 
         attendanceExplainRepository.save(
                 AttendanceExplain.builder()
-                        .idemployee(attendanceExplainRequest.getIdemployee())
                         .attendance(attendance)
                         .explaination(attendanceExplainRequest.getReason())
                         .status(0)
@@ -93,7 +92,7 @@ public class AttendanceExplainServiceImpl implements AttendanceExplainService {
         List<AttedanceExplainResponse> attedanceExplainResponses =
                 attendanceExplainList.stream().map(
                         e->new AttedanceExplainResponse(
-                                e.getIdemployee(),
+                                e.getAttendance().getIdemployee(),
                                 e.getAttendance().getDateattendance(),
                                 e.getAttendance().getCheckintime(),
                                 e.getAttendance().getCheckouttime(),
@@ -110,7 +109,7 @@ public class AttendanceExplainServiceImpl implements AttendanceExplainService {
     public ResponseEntity<?> updateAttendanceExplain(AttedanceExplainResponse attedanceExplainResponse) {
         Attendance attendance = attendanceRepository.findByIdemployeeAndDateattendance(attedanceExplainResponse.getIdemployee(),attedanceExplainResponse.getDate());
 
-        AttendanceExplain attendanceExplain = attendanceExplainRepository.findByIdemployeeAndAttendance(attedanceExplainResponse.getIdemployee(),attendance);
+        AttendanceExplain attendanceExplain = attendanceExplainRepository.findByAttendance(attendance);
         attendanceExplain.setStatus(StatusAttedanceExplain.getCodeFromStatus(attedanceExplainResponse.getStatus()));
         attendanceExplainRepository.save(attendanceExplain);
         return ResponseEntity.ok()

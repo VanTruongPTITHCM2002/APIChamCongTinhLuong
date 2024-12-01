@@ -23,14 +23,11 @@ public class Payroll {
     @Column(name = "idemployee",length = 45)
     private String idemployee;
 
-    @Column(name="name",length = 100)
-    private String name;
-
     @Column(name = "month")
     private int month;
 
-    @Column(name="year")
-    private int year;
+    @Column(name = "year")
+    private  int year;
 
     @Column(name="basicsalary")
     private int basicsalary;

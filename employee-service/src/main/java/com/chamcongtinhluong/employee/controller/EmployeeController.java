@@ -32,12 +32,6 @@ public class EmployeeController {
     public ResponseEntity<?> getEmployees(){
         return employeeService.getEmployeeActive();
     }
-// Admin
-//    @GetMapping("/generateId")
-//    public ResponseEntity<?> getIdempployee(){
-//        return ResponseEntity.ok().body(
-//                new ResponeObject(HttpStatus.OK.value(), "Generate id success",employeeService.generateEmployeeId()));
-//    }
 
 //    Admin and User
     @GetMapping("/{idEmployee}")

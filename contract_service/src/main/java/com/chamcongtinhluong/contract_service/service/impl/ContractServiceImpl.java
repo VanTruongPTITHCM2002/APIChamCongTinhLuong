@@ -38,6 +38,7 @@ public class ContractServiceImpl implements ContractService {
                                 .idemployee(contract.getIdemployee())
                                 .basicsalary(contract.getBasicsalary())
                                 .workingdays(contract.getWorkingdays())
+                                .leavedays(contract.getLeavedays())
                                 .startdate(contract.getStartdate())
                                 .endate(contract.getEndate())
                                 .status(StatusContract.getStatusFromCode(contract.getStatus()))
@@ -62,6 +63,7 @@ public class ContractServiceImpl implements ContractService {
                                 .idemployee(contract.getIdemployee())
                                 .basicsalary(contract.getBasicsalary())
                                 .workingdays(contract.getWorkingdays())
+                                .leavedays(contract.getLeavedays())
                                 .startdate(contract.getStartdate())
                                 .endate(contract.getEndate())
                                 .status(StatusContract.getStatusFromCode(contract.getStatus()))
@@ -137,6 +139,7 @@ public class ContractServiceImpl implements ContractService {
                 .endate(contractRequest.getEndate())
                 .startdate(contractRequest.getStartdate())
                 .workingdays(contractRequest.getWorkingdays())
+                .leavedays(contractRequest.getLeavedays())
                         .status(StatusContract.getCodeFromStatus("Còn hợp đồng"))
 
                 .build());
@@ -169,6 +172,7 @@ public class ContractServiceImpl implements ContractService {
         contract.setIdemployee(contractUpdate.getNewContractRequest().getIdemployee());
         contract.setBasicsalary(contractUpdate.getNewContractRequest().getBasicsalary());
         contract.setWorkingdays(contractUpdate.getNewContractRequest().getWorkingdays());
+        contract.setLeavedays(contractUpdate.getNewContractRequest().getLeavedays());
         contract.setStartdate(contractUpdate.getNewContractRequest().getStartdate());
         contract.setEndate(contractUpdate.getNewContractRequest().getEndate());
         contractRepository.save(contract);
@@ -191,9 +195,12 @@ public class ContractServiceImpl implements ContractService {
                             .data("")
                     .build());
         }
-        contract.setStatus(-1);
-        contractRepository.save(contract);
-        contractEmployeeService.updateStatusEmployee(idemployee);
+        Date now = new Date();
+        if(now.after(contract.getEndate())) {
+            contract.setStatus(-1);
+            contractRepository.save(contract);
+            contractEmployeeService.updateStatusEmployee(idemployee);
+        }
         return ResponseEntity.ok().body(ApiResponse.builder()
                         .status(HttpStatus.OK.value())
                         .message("Thay đổi trạng thái thành công")

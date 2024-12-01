@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "account-service", url = "http://localhost:8080/api/v1/employee")
 public interface DetailSalaryServiceClient {
 
-    @GetMapping("/detail-salary/{idemployee}")
-    String getDetailSalary(@PathVariable String idemployee);
+    @GetMapping("/detail-salary/{idEmployee}")
+    String getDetailSalary(@PathVariable String idEmployee);
 
 
 }
