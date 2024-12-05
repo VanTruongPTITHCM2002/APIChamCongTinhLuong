@@ -4,6 +4,7 @@ import com.chamcongtinhluong.employee.service.DepartmentsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,5 +17,10 @@ public class DepartmentsController {
     @GetMapping
     private ResponseEntity<?> getDepartments(){
         return departmentsService.getDepartments();
+    }
+
+    @GetMapping("/{idEmployee}")
+    private ResponseEntity<?> getDepartmentNameByIdEmployee(@PathVariable String idEmployee){
+        return departmentsService.getDepartmentNameByIdEmployee(idEmployee);
     }
 }

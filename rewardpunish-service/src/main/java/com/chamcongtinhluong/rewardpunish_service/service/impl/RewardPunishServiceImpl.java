@@ -72,15 +72,15 @@ public class RewardPunishServiceImpl implements RewardPunishService {
     @Override
     public ResponseEntity<?> addRewardPunish( RewardPunishResponse rewardPunishResponse) {
 
-        Boolean isCheck = workScheduleServiceClient.getWorkScheduleDetailByIdAndDate(rewardPunishResponse.getIdemployee(),rewardPunishResponse.getSetupdate());
-        if(!isCheck)
-        {
-            return ResponseEntity.ok().body(
-                    ApiResponse.builder().status(HttpStatus.NOT_FOUND.value())
-                            .message("Không thể thêm do nhân viên không có lịch trong ngày này")
-                            .data(rewardPunishResponse).build()
-            );
-        }
+//        Boolean isCheck = workScheduleServiceClient.getWorkScheduleDetailByIdAndDate(rewardPunishResponse.getIdemployee(),rewardPunishResponse.getSetupdate());
+//        if(!isCheck)
+//        {
+//            return ResponseEntity.ok().body(
+//                    ApiResponse.builder().status(HttpStatus.NOT_FOUND.value())
+//                            .message("Không thể thêm do nhân viên không có lịch trong ngày này")
+//                            .data(rewardPunishResponse).build()
+//            );
+//        }
         rewardPunishRepository.save(RewardPunish.builder()
                 .idemployee(rewardPunishResponse.getIdemployee())
                 .type(TypeRewardPunish.getCodeFromStatus(rewardPunishResponse.getType()))

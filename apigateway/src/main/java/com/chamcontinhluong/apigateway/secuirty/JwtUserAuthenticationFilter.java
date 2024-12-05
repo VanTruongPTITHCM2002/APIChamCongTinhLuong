@@ -3,20 +3,22 @@ package com.chamcontinhluong.apigateway.secuirty;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-@Builder
+@Component
+@RequiredArgsConstructor
 public class JwtUserAuthenticationFilter implements GatewayFilter {
-    private static final String SECRET_KEY = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437"; // Thay đổi bằng khóa bí mật của bạn
-    @Autowired
-    private JwtService jwtService;
-    private String checkpath;
+
+    private final JwtService jwtService;
+
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -36,10 +38,11 @@ public class JwtUserAuthenticationFilter implements GatewayFilter {
         String role = extractRoleFromToken(token);
         if (role != null) {
 
-            if (checkpath.startsWith(path) && !role.equals("USER")) {
+            if (!role.equals("USER")) {
                 exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
                 return exchange.getResponse().setComplete();
             }
+
         }else {
 
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
@@ -60,7 +63,7 @@ public class JwtUserAuthenticationFilter implements GatewayFilter {
     private String extractRoleFromToken(String token) {
         try {
             Claims claims = Jwts.parser()
-                    .setSigningKey(SECRET_KEY)
+                    .setSigningKey(jwtService.SECRET_KEY)
                     .parseClaimsJws(token)
                     .getBody();
 

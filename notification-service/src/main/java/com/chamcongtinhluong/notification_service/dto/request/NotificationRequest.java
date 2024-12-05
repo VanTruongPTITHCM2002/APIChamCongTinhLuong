@@ -30,8 +30,6 @@ public class NotificationRequest {
     @NotEmpty(message = "Vui long khong de trong chu de thong bao")
     private String type;
     private String status;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private Date createAt;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private Date updateAt;
+    private String createAt;
+    private String updateAt;
 }

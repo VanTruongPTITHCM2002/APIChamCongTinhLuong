@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -62,10 +63,9 @@ public class NotificationServiceImpl implements NotificationService {
     public ResponseEntity<?> deleteNotification(NotificationRequest notificationRequestList) {
         try{
 
-           Notification notification = notificationRepository.findByTypeContentSenderIdReceiverIdAndCreateAt(
+           Notification notification = notificationRepository.findByTypeContentSenderIdReceiverId(
                    notificationRequestList.getType(),notificationRequestList.getContent(),
-                   notificationRequestList.getSenderId(),notificationRequestList.getReceiverId(),
-                  notificationRequestList.getCreateAt()
+                   notificationRequestList.getSenderId(),notificationRequestList.getReceiverId()
            );
            if(notification == null){
                return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -74,11 +74,23 @@ public class NotificationServiceImpl implements NotificationService {
                                .message("Không tìm thấy thông báo")
                                .build());
            }
-           notificationRepository.delete(notification);
-            return ResponseEntity.status(HttpStatus.OK)
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            String dateServer = simpleDateFormat.format(notification.getCreateAt());
+
+           if(notificationRequestList.getCreateAt().equals(dateServer)){
+               notificationRepository.delete(notification);
+               return ResponseEntity.status(HttpStatus.OK)
+                       .body(ApiResponse.builder()
+                               .status(HttpStatus.OK.value())
+                               .message("Xóa thông báo thành công")
+                               .build());
+           }
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.builder()
-                            .status(HttpStatus.OK.value())
-                            .message("Xóa thông báo thành công")
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .message("Không tìm thấy thông báo")
                             .build());
         }catch (Exception e){
             System.out.println(e.getMessage());

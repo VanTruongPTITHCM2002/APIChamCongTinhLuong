@@ -21,6 +21,9 @@ public class GatewayConfig {
     @Autowired
     private JwtAdminAuthenticationFilter jwtAdminAuthenticationFilter;
 
+    @Autowired
+    private JwtUserAuthenticationFilter jwtUserAuthenticationFilter;
+
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -72,9 +75,7 @@ public class GatewayConfig {
                 )
                 .route("attendance-service-user", r -> r.path("/api/v1/attendance")
                         .and().method(HttpMethod.POST, HttpMethod.PUT)
-                        .filters(f -> f.filter(JwtUserAuthenticationFilter.builder()
-                                .checkpath("/api/v1/attendance")
-                                .build()))
+                        .filters(f -> f.filter(jwtUserAuthenticationFilter))
                         .uri("lb://attendance-service")
                 )
 
@@ -99,10 +100,8 @@ public class GatewayConfig {
                 )
                 .route("attendance_explain-service-user",r->r.path("/api/v1/attendance_explain")
                         .and().method(HttpMethod.POST)
-                        .filters(f->f.filter(JwtUserAuthenticationFilter
-                                .builder()
-                                .checkpath("/api/v1/attendance_explain")
-                                .build()))
+                        .filters(f->f.filter(jwtUserAuthenticationFilter
+                                ))
                         .uri("lb://attendance-service")
                 )
                 .route("attendance_explain-service",r->r.path("/api/v1/attendance_explain/filter")
