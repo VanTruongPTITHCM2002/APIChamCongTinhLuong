@@ -14,7 +14,6 @@ import com.chamcongtinhluong.attendence.repository.AttendanceStatusRepository;
 import com.chamcongtinhluong.attendence.repository.WorkRecordRepository;
 import com.chamcongtinhluong.attendence.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,8 @@ import org.springframework.stereotype.Service;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         List<AttendanceResponse> attendanceResponseList =
                 attendanceRepository.findAll().stream().map(
                         e->new AttendanceResponse(
-                                e.getIdemployee(),
+                                e.getWorkRecord().getIdemployee(),
                                 e.getDateattendance(),
                                 formatTime(e.getCheckintime()),
                                 formatTime(e.getCheckouttime()),
@@ -77,7 +78,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         List<AttendanceResponse> attendanceResponseList =
                 attendanceList.stream().map(
                         e->new AttendanceResponse(
-                                e.getIdemployee(),
+                                e.getWorkRecord().getIdemployee(),
                                 e.getDateattendance(),
                                 formatTime(e.getCheckintime()),
                                 formatTime(e.getCheckouttime()),
@@ -101,8 +102,14 @@ public class AttendanceServiceImpl implements AttendanceService {
                     .data("")
                     .build());
         }
+        if(attendanceRepository.findByWorkRecord_IdemployeeAndDateattendance(attendanceRequest.getIdemployee(), attendanceRequest.getDateattendance()) != null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder()
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .message("Bạn đã thực hien cham cong vao hom nay")
+                    .build());
+        }
         Attendance attendance = new Attendance();
-        attendance.setIdemployee(attendanceRequest.getIdemployee());
+//        attendance.setIdemployee(attendanceRequest.getIdemployee());
         attendance.setDateattendance(attendanceRequest.getDateattendance());
         attendance.setCheckintime(parseTime(attendanceRequest.getCheckintime()));
 //        attendance.setCheckouttime(parseTime(attendanceRequest.getCheckouttime()));
@@ -134,12 +141,33 @@ public class AttendanceServiceImpl implements AttendanceService {
                     .data("")
                     .build());
         }
-        Attendance attendance = attendanceRepository.findByIdemployeeAndDateattendance(attendanceRequest.getIdemployee(), attendanceRequest.getDateattendance());
-        attendance.setIdemployee(attendanceRequest.getIdemployee());
-        attendance.setDateattendance(attendanceRequest.getDateattendance());
-        attendance.setCheckintime(parseTime(attendanceRequest.getCheckintime()));
+        Attendance attendance = attendanceRepository.findByWorkRecord_IdemployeeAndDateattendance(attendanceRequest.getIdemployee(), attendanceRequest.getDateattendance());
+     //      attendance.setIdemployee(attendanceRequest.getIdemployee());
+    //    attendance.setDateattendance(attendanceRequest.getDateattendance());
+   //     attendance.setCheckintime(parseTime(attendanceRequest.getCheckintime()));
         attendance.setCheckouttime(parseTime(attendanceRequest.getCheckouttime()));
-        AttendanceStatus attendanceStatus =attendanceStatusRepository.findById(StatusAttendance.getCodeFromStatus(attendanceRequest.getStatus())).orElse(null);
+        LocalTime currentCheckIn = attendance.getCheckintime().toLocalTime();
+        LocalTime currentEndTime = attendance.getCheckouttime().toLocalTime();
+
+        // Giờ chuẩn
+        LocalTime standardCheckIn = LocalTime.of(8, 15); // 08:15
+        LocalTime standardEndTime = LocalTime.of(16, 45); // 16:45
+
+        // Biến lưu trạng thái
+        String statusAttendance;
+
+        // Logic kiểm tra trạng thái
+        if (currentCheckIn.isAfter(standardCheckIn) && currentEndTime.isAfter(standardEndTime)) {
+            statusAttendance = "Đi trễ";
+        } else if (currentCheckIn.isBefore(standardCheckIn) && currentEndTime.isBefore(standardEndTime)) {
+            statusAttendance = "Về sớm";
+        } else if (currentCheckIn.isAfter(standardCheckIn) && currentEndTime.isBefore(standardEndTime)) {
+            statusAttendance = "Đi trễ về sớm";
+        } else {
+            statusAttendance = "Đi làm đầy đủ";
+        }
+
+        AttendanceStatus attendanceStatus =attendanceStatusRepository.findById(StatusAttendance.getCodeFromStatus(statusAttendance)).orElse(null);
         attendance.setAttendanceStatus(attendanceStatus);
         WorkRecord workRecord = workRecordRepository.findByIdemployeeAndMonthAndYear(
                 attendanceRequest.getIdemployee(),
@@ -147,7 +175,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 attendanceRequest.getDateattendance().getYear() + 1900
         );
 
-        attendance.setNumberwork(attendanceRequest.getNumberwork());
+        attendance.setNumberwork(calculateWorkHours(attendance.getCheckintime().toLocalTime(),attendance.getCheckouttime().toLocalTime()));
         workRecord.setDay_work(workRecord.getDay_work() + attendanceRequest.getNumberwork());
         attendanceRepository.save(attendance);
         workRecordRepository.save(workRecord);
@@ -163,11 +191,11 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public ResponseEntity<?> getAttendanceById(String idemployee) {
         List<AttendanceResponse> attendanceResponseList = attendanceRepository
-                .findAll().stream().filter(attendance -> attendance.getIdemployee()
+                .findAll().stream().filter(attendance -> attendance.getWorkRecord().getIdemployee()
                         .equals(idemployee))
                 .map(
                         e->new AttendanceResponse(
-                                e.getIdemployee(),
+                                e.getWorkRecord().getIdemployee(),
                                 e.getDateattendance(),
                                 formatTime(e.getCheckintime()),
                                 formatTime(e.getCheckouttime()),
@@ -196,9 +224,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public ResponseEntity<?> updateAttendanceByAdmin(AttendanceRequest attendanceRequest) throws ParseException {
-        Attendance attendance = attendanceRepository.findByIdemployeeAndDateattendance(attendanceRequest.getIdemployee(), attendanceRequest.getDateattendance());
+        Attendance attendance = attendanceRepository.findByWorkRecord_IdemployeeAndDateattendance(attendanceRequest.getIdemployee(), attendanceRequest.getDateattendance());
 
-        attendance.setIdemployee(attendanceRequest.getIdemployee());
+      //  attendance.setIdemployee(attendanceRequest.getIdemployee());
         attendance.setDateattendance(attendanceRequest.getDateattendance());
         attendance.setCheckintime(parseTime(attendanceRequest.getCheckintime()));
         attendance.setCheckouttime(parseTime(attendanceRequest.getCheckouttime()));
@@ -250,7 +278,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                     .build());
         }
 
-        Attendance attendanceCheck = attendanceRepository.findByIdemployeeAndDateattendance(attendanceRequest.getIdemployee(),attendanceRequest.getDateattendance());
+        Attendance attendanceCheck = attendanceRepository.findByWorkRecord_IdemployeeAndDateattendance(attendanceRequest.getIdemployee(),attendanceRequest.getDateattendance());
         if(attendanceCheck != null){
             return ResponseEntity.ok().body(ApiResponse.builder()
                     .status(HttpStatus.BAD_REQUEST.value())
@@ -260,7 +288,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
         Attendance attendance = new Attendance();
-        attendance.setIdemployee(attendanceRequest.getIdemployee());
+      //  attendance.setIdemployee(attendanceRequest.getIdemployee());
         attendance.setDateattendance(attendanceRequest.getDateattendance());
         attendance.setCheckintime(parseTime(attendanceRequest.getCheckintime()));
         attendance.setCheckouttime(parseTime(attendanceRequest.getCheckouttime()));
@@ -282,5 +310,27 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .message("Thực hiện chấm công thành công")
                 .data("")
                 .build());
+    }
+
+    public static float calculateWorkHours(LocalTime startTime, LocalTime endTime) {
+        // Thời gian chuẩn
+        LocalTime gracePeriodStart = LocalTime.of(8, 15);
+        LocalTime gracePeriodEnd = LocalTime.of(16, 45);
+
+        // Tính số phút đi trễ
+        long lateMinutes = 0;
+        if (startTime.isAfter(gracePeriodStart)) {
+            lateMinutes = Duration.between(gracePeriodStart, startTime).toMinutes();
+        }
+
+        // Tính số phút về sớm
+        long earlyLeaveMinutes = 0;
+        if (endTime.isBefore(gracePeriodEnd)) {
+            earlyLeaveMinutes = Duration.between(endTime, gracePeriodEnd).toMinutes();
+        }
+
+        // Tính toán tỷ lệ làm việc (dựa trên tổng thời gian làm việc là 480 phút)
+        double workHours = 1 - ((lateMinutes + earlyLeaveMinutes) / 480.0);
+        return (float) Math.max(Math.round(workHours * 1000.0) / 1000.0, 0); // Làm tròn 3 chữ số thập phân và không nhỏ hơn 0
     }
 }

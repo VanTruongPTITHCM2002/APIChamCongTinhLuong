@@ -124,6 +124,19 @@ public class WorkRecordServiceImpl implements WorkRecordService {
     }
 
     @Override
+    public WorkRecordResponse getWorkRecordMany(WorkRecordRequest workRecordRequest) {
+        WorkRecord workRecordList = workRecordRepository.findByIdemployeeAndMonthAndYear(workRecordRequest.getIdemployee(),workRecordRequest.getMonth(),workRecordRequest.getYear());
+        if(workRecordList == null){
+         return null;
+        }
+        return new WorkRecordResponse(
+                workRecordList.getIdemployee(),
+                workRecordList.getMonth(),
+                workRecordList.getYear(),
+                workRecordList.getDay_work());
+    }
+
+    @Override
     public ResponseEntity<?> getIdemployee() {
         ResponseEntity<?> response = idEmployeeServiceClient.getEmployees();
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {

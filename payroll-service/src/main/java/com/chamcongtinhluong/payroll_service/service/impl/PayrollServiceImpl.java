@@ -2,10 +2,7 @@ package com.chamcongtinhluong.payroll_service.service.impl;
 
 import com.chamcongtinhluong.payroll_service.Enum.StatusPayroll;
 import com.chamcongtinhluong.payroll_service.commiunicate.*;
-import com.chamcongtinhluong.payroll_service.dto.request.DayWorkRequest;
-import com.chamcongtinhluong.payroll_service.dto.request.PayrollContractRequest;
-import com.chamcongtinhluong.payroll_service.dto.request.PayrollRequest;
-import com.chamcongtinhluong.payroll_service.dto.request.RewardPunishPayrollRequest;
+import com.chamcongtinhluong.payroll_service.dto.request.*;
 import com.chamcongtinhluong.payroll_service.dto.response.*;
 import com.chamcongtinhluong.payroll_service.entity.Payroll;
 import com.chamcongtinhluong.payroll_service.repository.PayrollRepository;
@@ -244,9 +241,64 @@ public class PayrollServiceImpl implements PayrollService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse> payrollManyEmployee(List<PayrollRequest> payrollRequests) {
+    public ResponseEntity<ApiResponse> payrollManyEmployee( PayrollRes payrollRes) {
+        for(String idEmployee: payrollRes.getListEmployee()){
+            try{
+            Payroll payrollCheck = payrollRepository.findByIdemployeeAndMonthAndYear(idEmployee,payrollRes.getMonth(),payrollRes.getYear());
+            DayWorkResponse dayWorkResponse = dayWorkServiceClient.getDayWorkEmployee(DayWorkRequest.builder()
+                    .idemployee(idEmployee)
+                    .month(payrollRes.getMonth())
+                    .year(payrollRes.getYear())
+                    .build());
+            PayrollContractResponse payrollContractResponse = payrollContractClient.getContractByIdMonthYear(
+                    PayrollContractRequest.builder().idemployee(idEmployee).month(payrollRes.getMonth()).year(
+                            payrollRes.getYear()
+                    ).build()
+            );
+            if(payrollCheck == null && dayWorkResponse != null && payrollContractResponse != null){
 
-        return null;
+
+                List<RewardPunishPayrollResponse> rewardPunishPayrollResponseList = rewardPunishPayrollClient.getRewardPunishForCalSalary(
+                        RewardPunishPayrollRequest.builder()
+                                .idemployee(idEmployee)
+                                .month(payrollRes.getMonth())
+                                .year(payrollRes.getYear())
+                                .build()
+                );
+                int rewardCash = rewardPunishPayrollResponseList == null ? 0 : rewardPunishPayrollResponseList.stream()
+                        .filter(r -> r.getType().equals("Thưởng"))
+                        .mapToInt(RewardPunishPayrollResponse::getCash)
+                        .sum();
+                int punishCash = rewardPunishPayrollResponseList == null ? 0 : rewardPunishPayrollResponseList.stream()
+                        .filter(r -> r.getType().equals("Phạt"))
+                        .mapToInt(RewardPunishPayrollResponse::getCash)
+                        .sum();
+                Payroll payroll = new Payroll();
+                payroll.setIdemployee(idEmployee);
+                payroll.setMonth(payrollRes.getMonth());
+                payroll.setYear(payrollRes.getYear());
+                payroll.setReward(rewardCash);
+                payroll.setPunish(punishCash);
+//        payroll.setName(name);
+                payroll.setStatus(StatusPayroll.getCodeFromStatus(payrollRes.getStatus()));
+                payroll.setDatecreated(payrollRes.getDatecreated());
+                payroll.setDay_work(dayWorkResponse.getDay_work());
+                payroll.setBasicsalary(payrollContractResponse.getBasicsalary());
+                payroll.setTotalpayment(((dayWorkResponse.getDay_work() * payrollContractResponse.getBasicsalary())/ payrollContractResponse.getDayworks() )+ rewardCash - punishCash);
+                payrollRepository.save(payroll);
+
+                payrollContractClient.changeStatusContract(idEmployee,payrollRes.getMonth(),payrollRes.getYear());
+            }}catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Tính lương thành công")
+                .data("")
+                .build());
     }
 
     @Override

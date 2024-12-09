@@ -35,8 +35,9 @@ public interface ContractRepository extends JpaRepository<Contract,Integer> {
     @Query("SELECT c " +
             "FROM Contract c " +
             "WHERE c.idemployee = :idemployee AND " +
-            "(MONTH(c.startdate) <= :month AND YEAR(c.startdate) <= :year) AND " +
-            "(MONTH(c.endate) >= :month AND YEAR(c.endate) >= :year)")
+            "( (YEAR(c.startdate) < :year OR (YEAR(c.startdate) = :year AND MONTH(c.startdate) <= :month)) AND " +
+            "  (YEAR(c.endate) > :year OR (YEAR(c.endate) = :year AND MONTH(c.endate) >= :month)) ) " +
+            "AND c.status = 1")
     Contract findContractByIdemployeeAndMonthAndYear(
             @Param("idemployee") String idemployee,
             @Param("month") int month,

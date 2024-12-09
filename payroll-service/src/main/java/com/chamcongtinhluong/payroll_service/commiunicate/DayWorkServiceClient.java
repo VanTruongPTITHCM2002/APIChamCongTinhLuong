@@ -1,6 +1,7 @@
 package com.chamcongtinhluong.payroll_service.commiunicate;
 
 import com.chamcongtinhluong.payroll_service.dto.request.DayWorkRequest;
+import com.chamcongtinhluong.payroll_service.dto.response.DayWorkResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,4 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface DayWorkServiceClient {
     @PostMapping("/getdaywork")
     public ResponseEntity<?> getDayWork(@RequestBody DayWorkRequest dayWorkRequest);
+
+    @PostMapping("/getdayworkIdemployee")
+    DayWorkResponse getDayWorkEmployee(@RequestBody DayWorkRequest workRecordRequest);
 }

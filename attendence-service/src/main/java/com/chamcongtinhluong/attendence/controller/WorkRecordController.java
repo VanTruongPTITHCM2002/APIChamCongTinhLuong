@@ -2,6 +2,7 @@ package com.chamcongtinhluong.attendence.controller;
 
 import com.chamcongtinhluong.attendence.dto.request.WorkRecordIDEmployeeRequest;
 import com.chamcongtinhluong.attendence.dto.request.WorkRecordRequest;
+import com.chamcongtinhluong.attendence.dto.response.WorkRecordResponse;
 import com.chamcongtinhluong.attendence.service.WorkRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,10 @@ public class WorkRecordController {
         return workRecordService.getWorkRecord(workRecordRequest);
     }
 
+    @PostMapping("/getdayworkIdemployee")
+    public WorkRecordResponse getDayWorkEmployee(@RequestBody WorkRecordRequest workRecordRequest){
+        return workRecordService.getWorkRecordMany(workRecordRequest);
+    }
 
     @PostMapping("/filter")
     public ResponseEntity<?> getWorkRecordById(@RequestBody WorkRecordIDEmployeeRequest workRecordIDEmployeeRequest){

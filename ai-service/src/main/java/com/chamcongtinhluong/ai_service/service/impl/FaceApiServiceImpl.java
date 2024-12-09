@@ -22,15 +22,19 @@ public class FaceApiServiceImpl implements FaceApiService {
     @Override
     public ResponseEntity<ApiResponse> saveFaceApi(FaceApiRequest faceApiRequest) {
 
-        byte[] faceDescriptor = new byte[faceApiRequest.getFaceDescriptor().length];
-        for (int i = 0; i < faceApiRequest.getFaceDescriptor().length; i++) {
-            faceDescriptor[i] = faceApiRequest.getFaceDescriptor()[i].byteValue();
+        Float[] faceDescriptorFloats = faceApiRequest.getFaceDescriptor();
+
+        // Chuyển Float[] thành byte[]
+        ByteBuffer buffer = ByteBuffer.allocate(faceDescriptorFloats.length * Float.BYTES);
+        for (Float floatValue : faceDescriptorFloats) {
+            buffer.putFloat(floatValue);
         }
+        byte[] faceDescriptorBytes = buffer.array();
 
         // Tạo đối tượng FaceData
         FaceApi faceData = new FaceApi();
         faceData.setIdEmployee(faceApiRequest.getEmployeeId());
-        faceData.setFaceDescriptor(faceDescriptor);
+        faceData.setFaceDescriptor(faceDescriptorBytes);
 
         // Lưu vào database
         faceApiRepository.save(faceData);
@@ -43,20 +47,33 @@ public class FaceApiServiceImpl implements FaceApiService {
 
     @Override
     public ResponseEntity<ApiResponse> recognizeFaceApi(FaceRecognizeRequest faceRecognizeRequest) {
-        byte[] inputDescriptor = toByteArray(faceRecognizeRequest.getFaceDescriptor());
-        FaceApi faceApi = faceApiRepository.findByIdEmployee(faceRecognizeRequest.getIdEmployee());
-        float similarity = compareDescriptors(inputDescriptor, faceApi.getFaceDescriptor());
-        if (similarity < 0.6) {
+        Float[] inputDescriptorFloats = faceRecognizeRequest.getFaceDescriptor();
+        float[] inputDescriptor = new float[inputDescriptorFloats.length];
+        for (int i = 0; i < inputDescriptorFloats.length; i++) {
+            inputDescriptor[i] = inputDescriptorFloats[i];
+        }
+
+        // Lặp qua các FaceApi đã lưu trong cơ sở dữ liệu
+        for (FaceApi faceApi : faceApiRepository.findAll()) {
+            // Chuyển byte[] trong FaceApi thành float[]
+            float[] savedDescriptor = byteArrayToFloatArray(faceApi.getFaceDescriptor());
+
+            // Tính toán độ tương đồng
+            float similarity = euclideanDistance(inputDescriptor, savedDescriptor);
+
+            // Kiểm tra ngưỡng
+            if (similarity < 0.6) {
                 return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
                         .status(HttpStatus.OK.value())
-                        .message("Nhan dien khuon mat thanh cong")
-                                .data(faceApi.getIdEmployee())
+                        .message("Nhận diện khuôn mặt thành công")
+                        .data(faceApi.getIdEmployee())
                         .build());
-
+            }
         }
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.builder()
-                        .status(HttpStatus.NOT_FOUND.value())
-                        .message("Khong tim thay khuon mat")
+                .status(HttpStatus.NOT_FOUND.value())
+                .message("Không tìm thấy khuôn mặt")
                 .build());
     }
 
@@ -92,12 +109,5 @@ public class FaceApiServiceImpl implements FaceApiService {
         return (float) Math.sqrt(sum);
     }
 
-    private byte[] toByteArray(Integer[] descriptor) {
-        byte[] byteArray = new byte[descriptor.length * 4];
-        for (int i = 0; i < descriptor.length; i++) {
-            ByteBuffer.wrap(byteArray, i * 4, 4).putFloat(descriptor[i]);
-        }
-        return byteArray;
-    }
 }
 

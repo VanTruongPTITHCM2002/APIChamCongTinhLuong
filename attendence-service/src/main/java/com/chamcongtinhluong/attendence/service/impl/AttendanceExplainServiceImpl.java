@@ -5,10 +5,8 @@ import com.chamcongtinhluong.attendence.dto.request.AttendanceExplainRequest;
 import com.chamcongtinhluong.attendence.dto.request.IdEmployeeRequest;
 import com.chamcongtinhluong.attendence.dto.response.ApiResponse;
 import com.chamcongtinhluong.attendence.dto.response.AttedanceExplainResponse;
-import com.chamcongtinhluong.attendence.dto.response.WorkRecordResponse;
 import com.chamcongtinhluong.attendence.entity.Attendance;
 import com.chamcongtinhluong.attendence.entity.AttendanceExplain;
-import com.chamcongtinhluong.attendence.entity.WorkRecord;
 import com.chamcongtinhluong.attendence.repository.AttendanceExplainRepository;
 import com.chamcongtinhluong.attendence.repository.AttendanceRepository;
 import com.chamcongtinhluong.attendence.service.AttendanceExplainService;
@@ -33,7 +31,7 @@ public class AttendanceExplainServiceImpl implements AttendanceExplainService {
         List<AttedanceExplainResponse> attedanceExplainResponses = attendanceExplainRepository.findAll()
                 .stream().map(e->
                         new AttedanceExplainResponse(
-                                e.getAttendance().getIdemployee(),
+                                e.getAttendance().getWorkRecord().getIdemployee(),
                                 e.getAttendance().getDateattendance(),
                                 e.getAttendance().getCheckintime(),
                                 e.getAttendance().getCheckouttime(),
@@ -51,7 +49,7 @@ public class AttendanceExplainServiceImpl implements AttendanceExplainService {
 
     @Override
     public ResponseEntity<?> addAttendanceExplain(AttendanceExplainRequest attendanceExplainRequest) {
-        Attendance attendance = attendanceRepository.findByIdemployeeAndDateattendance(attendanceExplainRequest.getIdemployee(),attendanceExplainRequest.getDate());
+        Attendance attendance = attendanceRepository.findByWorkRecord_IdemployeeAndDateattendance(attendanceExplainRequest.getIdemployee(),attendanceExplainRequest.getDate());
         if(attendance == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     ApiResponse.builder()
@@ -92,7 +90,7 @@ public class AttendanceExplainServiceImpl implements AttendanceExplainService {
         List<AttedanceExplainResponse> attedanceExplainResponses =
                 attendanceExplainList.stream().map(
                         e->new AttedanceExplainResponse(
-                                e.getAttendance().getIdemployee(),
+                                e.getAttendance().getWorkRecord().getIdemployee(),
                                 e.getAttendance().getDateattendance(),
                                 e.getAttendance().getCheckintime(),
                                 e.getAttendance().getCheckouttime(),
@@ -107,7 +105,7 @@ public class AttendanceExplainServiceImpl implements AttendanceExplainService {
 
     @Override
     public ResponseEntity<?> updateAttendanceExplain(AttedanceExplainResponse attedanceExplainResponse) {
-        Attendance attendance = attendanceRepository.findByIdemployeeAndDateattendance(attedanceExplainResponse.getIdemployee(),attedanceExplainResponse.getDate());
+        Attendance attendance = attendanceRepository.findByWorkRecord_IdemployeeAndDateattendance(attedanceExplainResponse.getIdemployee(),attedanceExplainResponse.getDate());
 
         AttendanceExplain attendanceExplain = attendanceExplainRepository.findByAttendance(attendance);
         attendanceExplain.setStatus(StatusAttedanceExplain.getCodeFromStatus(attedanceExplainResponse.getStatus()));

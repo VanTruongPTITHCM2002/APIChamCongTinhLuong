@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface AttendanceExplainRepository extends JpaRepository<AttendanceExplain,Integer> {
     @Query("SELECT a FROM AttendanceExplain a WHERE " +
-            "(a.attendance.idemployee = :idemployee)")
+            "(a.attendance.workRecord.idemployee = :idemployee)")
     List<AttendanceExplain> filterAttendanceExplain(
             @Param("idemployee") String idemployee);
     AttendanceExplain findByAttendance(Attendance attendance);

@@ -23,18 +23,6 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idattendance;
 
-    public Attendance(String idemployee, Date dateattendance, Time checkintime, Time checkouttime, AttendanceStatus attendanceStatus, Float numberwork) {
-        this.idemployee = idemployee;
-        this.dateattendance = dateattendance;
-        this.checkintime = checkintime;
-        this.checkouttime = checkouttime;
-        this.attendanceStatus = attendanceStatus;
-        this.numberwork = numberwork;
-    }
-
-    @Column(name="idemployee",length = 45)
-    private String idemployee;
-
     @Temporal(TemporalType.DATE)
     @Column(name = "dateattendance")
     private Date dateattendance;

@@ -41,7 +41,16 @@ public class GenerateID {
         return "NV" + departmentCodeUpper + formattedSequence;
     }
     private int getNextSequenceForDepartment(String department) {
+        List<String> employeeCodes = employeeRepository.findList(department);
         // Đếm số lượng nhân viên trong phòng ban và tăng số thứ tự lên 1
-        return employeeRepository.countByDepartments(department) + 1;
+        int maxSequence = employeeCodes.stream()
+                .map(code -> code.replaceAll("\\D+", "")) // Loại bỏ tất cả ký tự không phải số
+                .filter(s -> !s.isEmpty()) // Loại bỏ các chuỗi rỗng sau khi loại ký tự
+                .mapToInt(Integer::parseInt) // Chuyển chuỗi thành số nguyên
+                .max() // Tìm giá trị lớn nhất
+                .orElse(0); // Nếu không có mã nhân viên nào, trả về 0
+
+        // Tăng số lớn nhất lên 1 để tạo mã mới
+        return maxSequence + 1;
     }
 }

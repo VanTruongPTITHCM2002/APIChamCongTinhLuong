@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class FaceApiRequest {
     private String employeeId;
-    private Integer[] faceDescriptor;
+    private Float[] faceDescriptor;
 }

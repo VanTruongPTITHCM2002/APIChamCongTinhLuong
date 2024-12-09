@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FaceApiRepository extends JpaRepository<FaceApi,Integer> {
     FaceApi findByIdEmployee(String idEmployee);
+    FaceApi findByFaceDescriptor(byte[] faceDescriptor);
 }

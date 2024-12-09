@@ -8,17 +8,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance,Integer> {
 
     @Query("SELECT a FROM Attendance a WHERE " +
-            "(a.idemployee = :idemployee)")
+            "(a.workRecord.idemployee = :idemployee)")
     List<Attendance> filterAttendance(
             @Param("idemployee") String idemployee);
 
- Attendance findByIdemployeeAndDateattendance(String idemployee, Date dateattendance);
+ Attendance findByWorkRecord_IdemployeeAndDateattendance(String idemployee, Date dateattendance);
 
     @Query("SELECT COUNT(p) FROM Attendance p WHERE p.dateattendance = :dateattendance")
     int countByDateattendance(Date dateattendance);

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FaceRecognizeRequest {
-//    private String idEmployee;
-    private Float[] faceDescriptor;
+public class GeminiRequest {
+    private String prompt;
+    private int maxTokens;
 }

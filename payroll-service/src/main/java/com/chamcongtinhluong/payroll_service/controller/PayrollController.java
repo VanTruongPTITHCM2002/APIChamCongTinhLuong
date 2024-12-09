@@ -1,6 +1,8 @@
 package com.chamcongtinhluong.payroll_service.controller;
 
+import com.chamcongtinhluong.payroll_service.dto.request.PayrollCaculate;
 import com.chamcongtinhluong.payroll_service.dto.request.PayrollRequest;
+import com.chamcongtinhluong.payroll_service.dto.request.PayrollRes;
 import com.chamcongtinhluong.payroll_service.service.PayrollService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +45,11 @@ public class PayrollController {
     @PostMapping
     private ResponseEntity<?> addPayroll(@RequestBody PayrollRequest payrollRequest){
         return payrollService.payrollEmployee(payrollRequest);
+    }
+
+    @PostMapping("/many")
+    private ResponseEntity<?> addPayrollManyEmployee(@RequestBody PayrollRes payrollRes){
+        return payrollService.payrollManyEmployee(payrollRes);
     }
 
     @PutMapping

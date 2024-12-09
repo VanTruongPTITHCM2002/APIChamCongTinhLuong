@@ -21,7 +21,7 @@ public class FaceApi {
     @Column(name = "idemployee",length = 45)
     private String idEmployee;
 
-    @Lob
-    @Column(name = "face_descriptor",nullable = false)
+    @Lob // Sử dụng @Lob để đánh dấu trường này là kiểu Large Object (BLOB hoặc CLOB)
+    @Column(name = "face_descriptor", columnDefinition = "MEDIUMBLOB", nullable = false)
     private byte[] faceDescriptor;
 }

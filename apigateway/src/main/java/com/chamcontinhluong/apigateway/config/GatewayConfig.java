@@ -3,6 +3,7 @@ package com.chamcontinhluong.apigateway.config;
 import com.chamcontinhluong.apigateway.ConstantsURL;
 import com.chamcontinhluong.apigateway.secuirty.JwtAdminAuthenticationFilter;
 import com.chamcontinhluong.apigateway.secuirty.JwtAuthenticationFilter;
+import com.chamcontinhluong.apigateway.secuirty.JwtHRAuthenticationFilter;
 import com.chamcontinhluong.apigateway.secuirty.JwtUserAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -23,6 +24,9 @@ public class GatewayConfig {
 
     @Autowired
     private JwtUserAuthenticationFilter jwtUserAuthenticationFilter;
+
+    @Autowired
+    private JwtHRAuthenticationFilter jwtHRAuthenticationFilter;
 
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
@@ -56,7 +60,8 @@ public class GatewayConfig {
                                         "/api/v1/employee/**")
                         .or().path("/api/v1/departments")
                                 .and().method(HttpMethod.GET,HttpMethod.PUT,HttpMethod.POST,HttpMethod.DELETE)
-                        .filters(f->f.filter(jwtAuthenticationFilter))
+                        .filters(f->f.filter(jwtAuthenticationFilter)
+                        )
                         .uri("lb://employee-service"))
 
                 .route("employee-service", r -> r
@@ -70,12 +75,11 @@ public class GatewayConfig {
                         .uri("lb://employee-service"))
                 .route("attendance-service-admin", r -> r.path("/api/v1/attendance")
                         .and().method(HttpMethod.GET)
-                        .filters(f -> f.filter(jwtAdminAuthenticationFilter))
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://attendance-service")
                 )
                 .route("attendance-service-user", r -> r.path("/api/v1/attendance")
                         .and().method(HttpMethod.POST, HttpMethod.PUT)
-                        .filters(f -> f.filter(jwtUserAuthenticationFilter))
                         .uri("lb://attendance-service")
                 )
 
@@ -95,12 +99,12 @@ public class GatewayConfig {
                         .uri("lb://attendance-service"))
                 .route("attendance_explain-service-admin",r->r.path("/api/v1/attendance_explain")
                         .and().method(HttpMethod.PUT,HttpMethod.GET)
-                        .filters(f->f.filter(jwtAdminAuthenticationFilter))
+                        .filters(f->f.filter(jwtAuthenticationFilter))
                         .uri("http://localhost:8083")
                 )
                 .route("attendance_explain-service-user",r->r.path("/api/v1/attendance_explain")
                         .and().method(HttpMethod.POST)
-                        .filters(f->f.filter(jwtUserAuthenticationFilter
+                        .filters(f->f.filter(jwtAuthenticationFilter
                                 ))
                         .uri("lb://attendance-service")
                 )
@@ -111,7 +115,7 @@ public class GatewayConfig {
                 )
                 .route("workschedule-service-admin",r -> r.path("/api/v1/workschedule")
                         .and().method(HttpMethod.POST,HttpMethod.GET,HttpMethod.DELETE)
-                        .filters(f -> f.filter(jwtAdminAuthenticationFilter))
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://workSchedule-service"))
                 .route("workschedule-service",r->r.path(
                         "/api/v1/workschedule/getidemp"
@@ -125,7 +129,7 @@ public class GatewayConfig {
                         .uri("lb://workSchedule-service"))
 
                 .route("workscheduledetail-service",r->r.path("/api/v1/workscheduledetail/**")
-                        .filters(f->f.filter(jwtAdminAuthenticationFilter))
+                        .filters(f->f.filter(jwtAuthenticationFilter))
                         .uri("lb://workSchedule-service"))
 
                 .route("payroll-service-admin",r->r.path("/api/v1/payroll/**")
@@ -153,7 +157,7 @@ public class GatewayConfig {
                 .route("contract-service-admin",r->r.path("/api/v1/contract/**")
                         .and().method(HttpMethod.POST,HttpMethod.GET,HttpMethod.PUT)
                         .filters(f->f.filter(
-                               jwtAdminAuthenticationFilter))
+                               jwtAuthenticationFilter))
                         .uri("http://localhost:8087"))
                 .route("contract-service",r->r.path("/api/v1/contract/checkcontract")
                         .or().path("/api/v1/contract/countContract")

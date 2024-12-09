@@ -52,7 +52,12 @@ public class DepartmentsServiceImpl implements DepartmentsService {
         try{
             Employee employee = employeeRepository.findByIdemployee(idEmployee);
             return ResponseEntity.ok().body(
-                    employee.getDepartments().getDepartmentName()
+                    ResponeObject.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("Da tim thay phong ban cua nhan vien")
+                            .data(employee.getDepartments().getDepartmentName())
+                            .build()
+
             );
         }catch (NullPointerException nullPointerException){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
