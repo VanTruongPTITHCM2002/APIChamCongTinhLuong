@@ -11,7 +11,8 @@ public enum StatusAttendance {
     NGHI_BU("Nghỉ bù", 8),
     LAM_THEM_GIO("Làm thêm giờ", 9),
     CONG_TAC("Công tác", 10),
-    DI_TRE_VE_SOM("Đi trễ về sớm",11);
+    DI_TRE_VE_SOM("Đi trễ về sớm",11),
+    KHONG_DI_LAM("Không đi làm",12);
     private final String status;
     private final int code;
 

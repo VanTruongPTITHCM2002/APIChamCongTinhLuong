@@ -73,6 +73,11 @@ public class EmployeeController {
         return employeeService.uploadFileEmployee(multipartFile,idEmployee);
     }
 
+    @PostMapping("/getNumberSal")
+    public int getNumberSalary(@RequestParam String idEmployee){
+        return employeeService.getNumberSalary(idEmployee);
+    }
+
 //    Admin and user
     @PutMapping("{idEmployee}")
     public ResponseEntity<?>updateEmployee(@PathVariable String idEmployee, @RequestBody EmployeeRequest e){

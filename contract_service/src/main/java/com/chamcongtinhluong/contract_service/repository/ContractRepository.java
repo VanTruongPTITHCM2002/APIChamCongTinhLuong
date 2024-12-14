@@ -45,8 +45,8 @@ public interface ContractRepository extends JpaRepository<Contract,Integer> {
     );
 
     @Query("SELECT COUNT(c) FROM Contract c WHERE " +
-            "(MONTH(c.startdate) <= :month AND YEAR(c.startdate) <= :year) AND " +
-            "(MONTH(c.endate) >= :month AND YEAR(c.endate) >= :year)")
+            "( (YEAR(c.startdate) < :year OR (YEAR(c.startdate) = :year AND MONTH(c.startdate) <= :month)) AND " +
+            "  (YEAR(c.endate) > :year OR (YEAR(c.endate) = :year AND MONTH(c.endate) >= :month)) ) ")
     Integer countContractsByMonthAndYear(@Param("month") int month, @Param("year") int year);
 }
 

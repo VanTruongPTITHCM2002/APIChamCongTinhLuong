@@ -259,6 +259,33 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public int countSumAccount() {
+        List<Account> accounts = accountRepository.findAll();
+        if(accounts.isEmpty()){
+            return 0;
+        }
+        return accounts.size();
+    }
+
+    @Override
+    public int countActiveAccount() {
+        List<Account> accounts = accountRepository.findAll().stream().filter(account -> account.getStatus() == 1).toList();
+        if(accounts.isEmpty()){
+            return 0;
+        }
+        return accounts.size();
+    }
+
+    @Override
+    public int countInActiveAccount() {
+        List<Account> accounts = accountRepository.findAll().stream().filter(account -> account.getStatus() == 0).toList();
+        if(accounts.isEmpty()){
+            return 0;
+        }
+        return accounts.size();
+    }
+
+    @Override
     public ResponseEntity<?> deleteAccount(String username) {
         Account account = accountRepository.findByUsername(username).orElse(null);
         accountRepository.delete(account);

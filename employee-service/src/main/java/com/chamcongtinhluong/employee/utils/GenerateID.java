@@ -23,22 +23,22 @@ public class GenerateID {
     public String generateIdEmoloyee(String departmentName){
         Departments departments = departmentsRepository.findByDepartmentName(departmentName);
 //        String departmentCode = departmentCodes.get(departmentName);
-        String[] words = departmentName.split(" "); // Tách tên phòng ban thành các từ
-        StringBuilder departmentCode = new StringBuilder();
-
-        for (String word : words) {
-            if (!word.isEmpty()) {
-                departmentCode.append(word.charAt(0)); // Lấy chữ cái đầu tiên của mỗi từ
-            }
-        }
-
-        String departmentCodeUpper = departmentCode.toString().toUpperCase();
-        if (departments == null) {
-            throw new IllegalArgumentException("Phòng ban không hợp lệ");
-        }
+//        String[] words = departmentName.split(" "); // Tách tên phòng ban thành các từ
+//        StringBuilder departmentCode = new StringBuilder();
+//
+//        for (String word : words) {
+//            if (!word.isEmpty()) {
+//                departmentCode.append(word.charAt(0)); // Lấy chữ cái đầu tiên của mỗi từ
+//            }
+//        }
+//
+//        String departmentCodeUpper = departmentCode.toString().toUpperCase();
+//        if (departments == null) {
+//            throw new IllegalArgumentException("Phòng ban không hợp lệ");
+//        }
         int nextSequence = getNextSequenceForDepartment(departmentName);
         String formattedSequence = String.format("%02d", nextSequence);
-        return "NV" + departmentCodeUpper + formattedSequence;
+        return "NV" + departments.getDepartmentCode().toUpperCase() + formattedSequence;
     }
     private int getNextSequenceForDepartment(String department) {
         List<String> employeeCodes = employeeRepository.findList(department);

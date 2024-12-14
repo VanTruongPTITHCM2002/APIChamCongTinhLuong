@@ -19,6 +19,17 @@ public class AccountController {
         return accountService.getAccounts();
     }
 
+    @GetMapping("/account/sum")
+    public int getSumAccount(){
+        return accountService.countSumAccount();
+    }
+
+    @GetMapping("/account/active")
+    public int getAccountActive(){return accountService.countActiveAccount();}
+
+    @GetMapping("/account/inactive")
+    public int getAccountInActive(){return accountService.countInActiveAccount();}
+
     @PutMapping("/account/{username}")
     public ResponseEntity<?> updateAccount(@PathVariable String username,
                                            @RequestBody AccountResponse accountResponse){

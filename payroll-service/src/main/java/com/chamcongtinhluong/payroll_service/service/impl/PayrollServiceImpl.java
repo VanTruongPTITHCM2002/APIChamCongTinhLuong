@@ -284,7 +284,8 @@ public class PayrollServiceImpl implements PayrollService {
                 payroll.setDatecreated(payrollRes.getDatecreated());
                 payroll.setDay_work(dayWorkResponse.getDay_work());
                 payroll.setBasicsalary(payrollContractResponse.getBasicsalary());
-                payroll.setTotalpayment(((dayWorkResponse.getDay_work() * payrollContractResponse.getBasicsalary())/ payrollContractResponse.getDayworks() )+ rewardCash - punishCash);
+                int number = idEmployeeServiceClient.getNumberSalary(idEmployee);
+                payroll.setTotalpayment(((dayWorkResponse.getDay_work() * payrollContractResponse.getBasicsalary())/ payrollContractResponse.getDayworks() )+ number + rewardCash - punishCash);
                 payrollRepository.save(payroll);
 
                 payrollContractClient.changeStatusContract(idEmployee,payrollRes.getMonth(),payrollRes.getYear());

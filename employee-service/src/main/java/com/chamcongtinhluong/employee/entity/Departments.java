@@ -20,8 +20,11 @@ public class Departments {
     @Column(name = "iddepartment")
     private int idDepartment;
 
-    @Column(name = "departmentname",length = 45)
+    @Column(name = "departmentname",length = 100)
     private String departmentName;
+
+    @Column(name = "departmentcode",length = 45)
+    private String departmentCode;
 
     @OneToMany(mappedBy = "departments",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Employee> employees;

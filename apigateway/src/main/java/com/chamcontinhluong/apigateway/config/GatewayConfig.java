@@ -58,7 +58,8 @@ public class GatewayConfig {
 
                 .route("employee-service-admin", r -> r.path(
                                         "/api/v1/employee/**")
-                        .or().path("/api/v1/departments")
+                        .or().path("/api/v1/departments/**")
+                        .or().path("/api/v1/degree")
                                 .and().method(HttpMethod.GET,HttpMethod.PUT,HttpMethod.POST,HttpMethod.DELETE)
                         .filters(f->f.filter(jwtAuthenticationFilter)
                         )
@@ -169,8 +170,10 @@ public class GatewayConfig {
                 .route("leaveRequest-service",r->r.path("/api/v1/leave-request")
                         .filters(f->f.filter(jwtAuthenticationFilter))
                         .uri("lb://leaveRequest-service"))
-                .route("notification-service",r->r.path("/api/v1/notification")
+                .route("notification-service",r->r.path("/api/v1/notification/**")
                         .filters(f->f.filter(jwtAuthenticationFilter))
+                        .uri("lb://notification-service"))
+                .route("notification-auditlog-service",r->r.path("/api/v1/audit-log/**")
                         .uri("lb://notification-service"))
                 .build();
 

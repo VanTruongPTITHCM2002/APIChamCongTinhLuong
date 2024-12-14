@@ -1,6 +1,6 @@
 package com.chamcongtinhluong.employee.service.impl;
 
-import com.chamcongtinhluong.employee.Enum.DegreeNumber;
+
 import com.chamcongtinhluong.employee.Enum.StatusEmployee;
 import com.chamcongtinhluong.employee.communicate.AccountServiceClient;
 import com.chamcongtinhluong.employee.communicate.ContractEmployeeServiceClient;
@@ -106,6 +106,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public int getNumberSalary(String idEmployee) {
+        Employee employee = employeeRepository.findByIdemployee(idEmployee);
+        return employee.getDegree().getNumber_sal();
+    }
+
+    @Override
     public ResponseEntity<?> getEmployee() {
         try{
             List<EmployeeResponse> employeeDTOList = employeeRepository.findAll().stream()
@@ -172,7 +178,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         try{
             Employee employee = EmployeeMapper.INSTANCE.toEntity(e);
             employee.setIdemployee(generateID.generateIdEmoloyee(e.getDepartment()));
-            employee.setDegree(degreeRepository.findById(DegreeNumber.getCodeFromStatus(e.getDegree())).orElse(null));
+
+            employee.setDegree(degreeRepository.findByDegreename(e.getDegree()));
             employee.setDepartments(departmentsRepository.findByDepartmentName(e.getDepartment()));
             employeeRepository.save(employee);
 
@@ -204,7 +211,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         try{
             Employee emp = employeeRepository.findByIdemployee(id);
             EmployeeMapper.INSTANCE.updateEmployeeFromDto(e,emp);
-            emp.setDegree(degreeRepository.findById(DegreeNumber.getCodeFromStatus(e.getDegree())).orElse(null));
+            emp.setDegree(degreeRepository.findByDegreename(e.getDegree()));
             emp.setDepartments(departmentsRepository.findByDepartmentName(e.getDepartment()));
             emp.setStatus(StatusEmployee.getCodeFromStatus(e.getStatus()));
             if(e.getStatus().equals("Ngưng hoạt động")){
