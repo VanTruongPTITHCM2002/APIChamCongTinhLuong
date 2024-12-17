@@ -1,5 +1,6 @@
 package com.chamcongtinhluong.ai_service.service.impl;
 
+import com.chamcongtinhluong.ai_service.communicate.EmployeeServiceClient;
 import com.chamcongtinhluong.ai_service.dto.request.FaceApiRequest;
 import com.chamcongtinhluong.ai_service.dto.request.FaceRecognizeRequest;
 import com.chamcongtinhluong.ai_service.dto.response.ApiResponse;
@@ -8,9 +9,11 @@ import com.chamcongtinhluong.ai_service.repository.FaceApiRepository;
 import com.chamcongtinhluong.ai_service.service.FaceApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 @Service
@@ -18,7 +21,7 @@ import java.nio.ByteBuffer;
 public class FaceApiServiceImpl implements FaceApiService {
 
     private final FaceApiRepository faceApiRepository;
-
+    private final EmployeeServiceClient employeeServiceClient;
     @Override
     public ResponseEntity<ApiResponse> saveFaceApi(FaceApiRequest faceApiRequest) {
 
@@ -30,14 +33,24 @@ public class FaceApiServiceImpl implements FaceApiService {
             buffer.putFloat(floatValue);
         }
         byte[] faceDescriptorBytes = buffer.array();
-
         // Tạo đối tượng FaceData
-        FaceApi faceData = new FaceApi();
-        faceData.setIdEmployee(faceApiRequest.getEmployeeId());
+        FaceApi faceData = faceApiRepository.findByIdEmployee(faceApiRequest.getEmployeeId());
+        if(faceData == null){
+            faceData = new FaceApi();
+            faceData.setIdEmployee(faceApiRequest.getEmployeeId());
+            faceData.setFaceDescriptor(faceDescriptorBytes);
+            faceApiRepository.save(faceData);
+            try {
+                employeeServiceClient.uploadFile(faceDescriptorBytes,faceApiRequest.getEmployeeId());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         faceData.setFaceDescriptor(faceDescriptorBytes);
-
-        // Lưu vào database
         faceApiRepository.save(faceData);
+        // Lưu vào database
+
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.builder()
                         .status(HttpStatus.CREATED.value())
@@ -75,6 +88,15 @@ public class FaceApiServiceImpl implements FaceApiService {
                 .status(HttpStatus.NOT_FOUND.value())
                 .message("Không tìm thấy khuôn mặt")
                 .build());
+    }
+
+    @Override
+    public ResponseEntity<?> getImage(String idEmployee) {
+        FaceApi faceApi = faceApiRepository.findByIdEmployee(idEmployee);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)  // Chỉnh lại loại MIME tùy theo loại ảnh
+                .body(faceApi.getFaceDescriptor());
     }
 
     public float compareDescriptors(byte[] inputDescriptor, byte[] savedDescriptor) {

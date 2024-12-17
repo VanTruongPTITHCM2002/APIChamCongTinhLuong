@@ -91,6 +91,21 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public ResponseEntity<?> uploadImageEmployee(byte[] imageEmployee, String idEmployee) {
+
+        Employee employee = employeeRepository.findByIdemployee(idEmployee);
+        employee.setImage(imageEmployee);
+        employeeRepository.save(employee);
+        return ResponseEntity.ok().body(
+                ResponeObject.builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Tai anh thanh cong")
+                        .build()
+
+        );
+    }
+
+    @Override
     public ResponseEntity<?> getImageEmployee(String idEmployee) {
         Employee employee = employeeRepository.findByIdemployee(idEmployee);
         byte[] image = employee.getImage();

@@ -25,4 +25,9 @@ public class FaceApiController {
     public ResponseEntity<ApiResponse> recognizeFaceApiFromClient(@RequestBody FaceRecognizeRequest faceRecognizeRequest){
         return faceApiService.recognizeFaceApi(faceRecognizeRequest);
     }
+
+    @GetMapping("/image")
+    public ResponseEntity<?> getImage(@RequestParam String idEmployee){
+        return faceApiService.getImage(idEmployee);
+    }
 }

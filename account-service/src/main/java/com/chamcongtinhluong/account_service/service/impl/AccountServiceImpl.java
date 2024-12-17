@@ -132,18 +132,37 @@ public class AccountServiceImpl implements AccountService {
     public ResponseEntity<?> updateAccount(String username, AccountResponse accountResponse) {
         try{
             Account account = accountRepository.findByUsername(accountResponse.getUsername()).orElse(null);
-            account.setStatus(convertStatus.convert(accountResponse.getStatus()));
-            if(!account.getRoles().getRoleDescription().equals(accountResponse.getRole())){
-                Role role = roleRepository.findByRoleDescription(accountResponse.getRole());
-                account.setRoles(role);
+            if(account == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ResponseObject.builder()
+                                .status(HttpStatus.NOT_FOUND.value())
+                                .message("Không tìm thấy tài khoản " + accountResponse.getUsername())
+                                .build());
             }
+            if(accountResponse.getRole().equals("Quản trị viên")){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(ResponseObject.builder()
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .message("Khong the thay doi tai khoan nay")
+                                .build());
+            }
+            if(accountResponse.getRole().equals("Trưởng phòng nhân sự")){
+                long num = accountRepository.findAll().stream().filter(
+                        account2 -> account2.getRoles().getRolename().equals("HR")
+                        && account2.getStatus() == 1
+                ).count();
+                if(num > 0){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(ResponseObject.builder()
+                                    .status(HttpStatus.BAD_REQUEST.value())
+                                    .message("Khong the thay doi tai khoan nay thanh quyen nay")
+                                    .build());
+                }
+            }
+            Role role = roleRepository.findByRoleDescription(accountResponse.getRole());
+            account.setRoles(role);
+            account.setStatus(convertStatus.convert(accountResponse.getStatus()));
             accountRepository.save(account);
-        }catch (NullPointerException nullPointerException){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ResponseObject.builder()
-                            .status(HttpStatus.NOT_FOUND.value())
-                            .message("Không tìm thấy tài khoản " + accountResponse.getUsername())
-                            .build());
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(

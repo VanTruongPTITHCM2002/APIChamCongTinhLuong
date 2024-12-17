@@ -8,4 +8,5 @@ import org.springframework.http.ResponseEntity;
 public interface FaceApiService {
     ResponseEntity<ApiResponse> saveFaceApi(FaceApiRequest faceApiRequest);
     ResponseEntity<ApiResponse> recognizeFaceApi(FaceRecognizeRequest faceRecognizeRequest);
+    ResponseEntity<?>getImage(String idEmployee);
 }

@@ -57,8 +57,9 @@ public class Employee {
     @JoinColumn(name = "iddepartment")
     private Departments departments;
 
-    @Column(name = "image", columnDefinition = "BLOB")
+
     @Lob
+    @Column(name = "image", columnDefinition = "MEDIUMBLOB", nullable = false)
     private byte[] image;
 
     @Column(name="status")

@@ -19,6 +19,7 @@ public interface EmployeeService {
     public ResponseEntity<?> getEmployeeActive();
     public ResponseEntity<?> countEmployee();
     public ResponseEntity<?> uploadFileEmployee(MultipartFile multipartFile,String idEmployee) throws IOException;
+    public ResponseEntity<?> uploadImageEmployee(byte[] imageEmployee,String idEmployee);
     public ResponseEntity<?> getImageEmployee(String idEmployee);
     int getNumberSalary(String idEmployee);
 }

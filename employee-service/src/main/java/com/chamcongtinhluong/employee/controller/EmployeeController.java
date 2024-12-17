@@ -73,6 +73,12 @@ public class EmployeeController {
         return employeeService.uploadFileEmployee(multipartFile,idEmployee);
     }
 
+    @PostMapping("/upload/imageEmployee")
+    public ResponseEntity<?> uploadFile(@RequestParam("image")byte[] imageEmployee,
+                                        @RequestParam("idEmployee") String idEmployee) throws IOException {
+        return employeeService.uploadImageEmployee(imageEmployee,idEmployee);
+    }
+
     @PostMapping("/getNumberSal")
     public int getNumberSalary(@RequestParam String idEmployee){
         return employeeService.getNumberSalary(idEmployee);
