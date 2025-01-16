@@ -73,9 +73,9 @@ public class FaceApiServiceImpl implements FaceApiService {
 
             // Tính toán độ tương đồng
             float similarity = euclideanDistance(inputDescriptor, savedDescriptor);
-
+            System.out.println(faceApi.getIdEmployee() + " " + similarity);
             // Kiểm tra ngưỡng
-            if (similarity < 0.6) {
+            if (similarity < 0.4) {
                 return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
                         .status(HttpStatus.OK.value())
                         .message("Nhận diện khuôn mặt thành công")
@@ -119,10 +119,10 @@ public class FaceApiServiceImpl implements FaceApiService {
 
     // Tính Euclidean distance giữa 2 vector
     private float euclideanDistance(float[] vectorA, float[] vectorB) {
-        if (vectorA.length != vectorB.length) {
-            System.out.println("Lỗi: Các vector có độ dài khác nhau." + vectorA.length + '-' + vectorB.length);
-            return -1; // Trả về giá trị mặc định nếu các vector không khớp độ dài
-        }
+//        if (vectorA.length != vectorB.length) {
+//            System.out.println("Lỗi: Các vector có độ dài khác nhau." + vectorA.length + '-' + vectorB.length);
+//            return -1; // Trả về giá trị mặc định nếu các vector không khớp độ dài
+//        }
 
         float sum = 0;
         for (int i = 0; i < vectorA.length; i++) {

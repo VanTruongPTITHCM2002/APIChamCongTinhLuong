@@ -374,4 +374,60 @@ public class PayrollServiceImpl implements PayrollService {
 
         return monthlyTotals;
     }
+
+    @Override
+    public ResponseEntity<ApiResponse> getSalary() {
+        try{
+            List<SalaryResponse> salaryResponseList = payrollRepository.getMonthlySalarySummary();
+            return ResponseEntity.ok().body(ApiResponse.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("Lay thanh cong bang luong")
+                            .data(salaryResponseList)
+                    .build()
+            );
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.builder()
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message("Loi ket noi co du lieu")
+                            .build());
+        }
+
+    }
+
+    @Override
+    public ResponseEntity<?> getDetailSalary(int month, int year) {
+        try{
+            List<PayrollResponse> payrollResponseList = payrollRepository
+                    .findAll().stream().filter(payroll -> payroll.getMonth() == month &&
+                            payroll.getYear() == year).map(e->
+                            PayrollResponse.builder()
+                                    .idEmployee(e.getIdemployee())
+                                    .month(e.getMonth())
+                                    .year(e.getYear())
+                                    .basicSalary(e.getBasicsalary())
+                                    .reward(e.getReward())
+                                    .punish(e.getPunish())
+                                    .createDate(e.getDatecreated())
+                                    .day_work(e.getDay_work())
+                                    .totalPayment(e.getTotalpayment())
+                                    .status(StatusPayroll.getStatusFromCode(e.getStatus()))
+                                    .build()
+                    ).toList();
+            return ResponseEntity.ok().body(
+                    ApiResponse.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("Lay thanh cong chi tiet luong")
+                            .data(payrollResponseList)
+                            .build()
+            );
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.builder()
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message("Loi ket noi co du lieu")
+                            .build());
+        }
+    }
 }

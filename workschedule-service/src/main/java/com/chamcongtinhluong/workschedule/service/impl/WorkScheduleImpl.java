@@ -20,10 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.chamcongtinhluong.workschedule.repository.WorkScheduleRepository;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.time.LocalTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -106,6 +104,49 @@ public class WorkScheduleImpl implements WorkScheduleService {
         }
         workScheduleDetailsRepository.save(workScheduleDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.builder().status(HttpStatus.CREATED.value()).message("Thêm ca nhân viên thành công").data("").build());
+    }
+
+    @Override
+    public ResponseEntity<?> addWorkScheduleEmployeeByMonthYear(int month, int year) {
+        try{
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(year, month - 1, 1); // Tháng trong Calendar tính từ 0
+            Date startDate = calendar.getTime();
+
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+            Date endDate = calendar.getTime();
+
+            // Danh sách ngày làm việc trong tháng (trừ Chủ Nhật)
+            List<Date> workDays = new ArrayList<>();
+            calendar.setTime(startDate);
+            while (!calendar.getTime().after(endDate)) {
+                if (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                    workDays.add(calendar.getTime());
+                }
+                calendar.add(Calendar.DATE, 1);
+            }
+
+            List<WorkSchedule> workScheduleList = workScheduleRepository.findAll().stream().filter(
+                    workSchedule -> (workSchedule.getWorkdate().getMonth() +1) == month
+                            && (workSchedule.getWorkdate().getYear() +1900) == year
+            ).toList();
+
+            if(workScheduleList.isEmpty()){
+                for(Date workDay:workDays){
+                    WorkSchedule workSchedule = new WorkSchedule();
+                    workSchedule.setWorkdate(workDay);
+                    workSchedule.setStartime(LocalTime.parse("08:00"));
+                    workSchedule.setEndtime(LocalTime.parse("17:00"));
+                    workScheduleRepository.save(workSchedule);
+                }
+            }
+
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Them thanh cong");
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Loi ket noi den co so du lieu");
+        }
+
     }
 
     @Override

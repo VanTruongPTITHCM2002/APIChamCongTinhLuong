@@ -17,4 +17,6 @@ public interface PayrollService {
     public ResponseEntity<?>updatePayroll(PayrollRequest payrollRequest);
     public int totalPaymentInMonth(int month,int year);
     public List<Integer> getMonthlyTotals(String idemployee, int year);
+    ResponseEntity<ApiResponse> getSalary();
+    ResponseEntity<?> getDetailSalary(int month, int year);
 }

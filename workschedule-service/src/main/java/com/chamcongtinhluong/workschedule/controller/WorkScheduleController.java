@@ -45,6 +45,12 @@ public class WorkScheduleController {
         return workScheduleService.addWorkSchedule(workSchedule);
     }
 
+    @PostMapping("/many")
+    private ResponseEntity<?> addWorkScheduleMany(@RequestParam int month, @RequestParam int year){
+        return  workScheduleService.addWorkScheduleEmployeeByMonthYear(month,year);
+    }
+
+
     @PostMapping("/workschedulemployee")
     private ResponseEntity<?> addWorkScheduleEmployee(@RequestBody WorkScheduleDetailRequest workScheduleDetailRequest){
         return workScheduleService.addWorkScheduleEmployee(workScheduleDetailRequest);

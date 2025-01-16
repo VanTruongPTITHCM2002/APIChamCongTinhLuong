@@ -7,6 +7,7 @@ import com.chamcongtinhluong.workschedule.entity.WorkSchedule;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Date;
+import java.util.List;
 
 public interface WorkScheduleService {
     public ResponseEntity<?> getWorkSchedule();
@@ -14,6 +15,7 @@ public interface WorkScheduleService {
     public ResponseEntity<?> getEmp(String id);
     public ResponseEntity<?> getIDEmp(Date date);
     public ResponseEntity<?> addWorkScheduleEmployee(WorkScheduleDetailRequest workScheduleDetailRequest);
+    ResponseEntity<?> addWorkScheduleEmployeeByMonthYear(int month, int year);
     public ResponseEntity<?> getEmployeeWorkSchedule(DateRequest date);
     public ResponseEntity<?> deleteWorkSchedule(Date date);
 }

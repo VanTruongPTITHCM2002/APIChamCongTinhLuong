@@ -1,5 +1,6 @@
 package com.chamcongtinhluong.payroll_service.repository;
 
+import com.chamcongtinhluong.payroll_service.dto.response.SalaryResponse;
 import com.chamcongtinhluong.payroll_service.entity.Payroll;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,18 @@ public interface PayrollRepository extends JpaRepository<Payroll,Integer> {
 
     @Query("SELECT p FROM Payroll p WHERE p.year = :year AND p.idemployee = :idemployee")
     List<Payroll> findByYearAndEmployee(@Param("year") int year, @Param("idemployee") String idemployee);
+
+    @Query("""
+            SELECT 
+                new com.chamcongtinhluong.payroll_service.dto.response.SalaryResponse(
+                    p.month,
+                    p.year,
+                    COUNT(p.idemployee),
+                    SUM(p.totalpayment)
+                )
+            FROM Payroll p
+            GROUP BY p.month, p.year
+            ORDER BY p.year, p.month
+            """)
+    List<SalaryResponse> getMonthlySalarySummary();
 }

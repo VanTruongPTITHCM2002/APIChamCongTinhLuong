@@ -2,6 +2,7 @@ package com.chamcongtinhluong.attendence.service.impl;
 
 import com.chamcongtinhluong.attendence.Enum.StatusAttendance;
 import com.chamcongtinhluong.attendence.communicate.WorkScheduleServiceClient;
+import com.chamcongtinhluong.attendence.dto.request.AttendanceNewRequest;
 import com.chamcongtinhluong.attendence.dto.request.AttendanceRequest;
 import com.chamcongtinhluong.attendence.dto.request.IdEmployeeRequest;
 import com.chamcongtinhluong.attendence.dto.response.ApiResponse;
@@ -265,6 +266,101 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         }
         return count;
+    }
+
+    @Override
+    public ResponseEntity<?> addAttendanceNew(AttendanceNewRequest attendanceNewRequest) throws ParseException {
+       try {
+           Boolean isCheck = workScheduleServiceClient.getWorkScheduleDetailByIdAndDate(attendanceNewRequest.getIdEmployee(), attendanceNewRequest.getDateAttendance());
+           if (!isCheck) {
+               return ResponseEntity.ok().body(ApiResponse.builder()
+                       .status(HttpStatus.NOT_FOUND.value())
+                       .message("Không thể thực hiện chấm công ngày hôm nay do không có lịch lảm việc")
+                       .data("")
+                       .build());
+           }
+           Attendance attendance = attendanceRepository.findByWorkRecord_IdemployeeAndDateattendance(attendanceNewRequest.getIdEmployee(), attendanceNewRequest.getDateAttendance());
+           if (attendance != null) {
+               if (attendance.getCheckouttime() == null) {
+                   attendance.setCheckouttime(parseTime(attendanceNewRequest.getTimeWork()));
+                   LocalTime currentCheckIn = attendance.getCheckintime().toLocalTime();
+                   LocalTime currentEndTime = attendance.getCheckouttime().toLocalTime();
+
+                   // Giờ chuẩn
+                   LocalTime standardCheckIn = LocalTime.of(8, 15); // 08:15
+                   LocalTime standardEndTime = LocalTime.of(16, 45); // 16:45
+
+                   // Biến lưu trạng thái
+                   String statusAttendance;
+
+                   // Logic kiểm tra trạng thái
+                   if (currentCheckIn.isAfter(standardCheckIn) && currentEndTime.isAfter(standardEndTime)) {
+                       statusAttendance = "Đi trễ";
+                   } else if (currentCheckIn.isBefore(standardCheckIn) && currentEndTime.isBefore(standardEndTime)) {
+                       statusAttendance = "Về sớm";
+                   } else if (currentCheckIn.isAfter(standardCheckIn) && currentEndTime.isBefore(standardEndTime)) {
+                       statusAttendance = "Đi trễ về sớm";
+                   } else {
+                       statusAttendance = "Đi làm đầy đủ";
+                   }
+
+                   AttendanceStatus attendanceStatus = attendanceStatusRepository.findById(StatusAttendance.getCodeFromStatus(statusAttendance)).orElse(null);
+                   attendance.setAttendanceStatus(attendanceStatus);
+                   WorkRecord workRecord = workRecordRepository.findByIdemployeeAndMonthAndYear(
+                           attendanceNewRequest.getIdEmployee(),
+                           attendanceNewRequest.getDateAttendance().getMonth() + 1,
+                           attendanceNewRequest.getDateAttendance().getYear() + 1900
+                   );
+
+                   attendance.setNumberwork(calculateWorkHours(attendance.getCheckintime().toLocalTime(), attendance.getCheckouttime().toLocalTime()));
+                   workRecord.setDay_work(attendance.getNumberwork());
+                   attendanceRepository.save(attendance);
+                   workRecordRepository.save(workRecord);
+                   return ResponseEntity.ok().body(
+                           ApiResponse.builder()
+                                   .status(HttpStatus.OK.value())
+                                   .message("Chấm công ra thành công")
+                                   .data("")
+                                   .build()
+                   );
+               }
+
+                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                           ApiResponse.builder()
+                                   .status(HttpStatus.BAD_REQUEST.value())
+                                   .message("Ban da cham cong hom nay roi khong the cham cong nua")
+                                   .data("")
+                                   .build()
+                   );
+
+           }
+
+               Attendance a = new Attendance();
+               a.setDateattendance(attendanceNewRequest.getDateAttendance());
+               a.setCheckintime(parseTime(attendanceNewRequest.getTimeWork()));
+               WorkRecord workRecord = workRecordRepository.findByIdemployeeAndMonthAndYear(attendanceNewRequest.getIdEmployee(),
+                       attendanceNewRequest.getDateAttendance().getMonth() + 1,
+                       attendanceNewRequest.getDateAttendance().getYear() + 1900
+               );
+               a.setWorkRecord(workRecord);
+               attendanceRepository.save(a);
+               return ResponseEntity.ok().body(
+                       ApiResponse.builder()
+                               .status(HttpStatus.OK.value())
+                               .message("Chấm công vao thành công")
+                               .data("")
+                               .build()
+               );
+
+       }catch (Exception e){
+           System.out.println(e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                ApiResponse.builder()
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .message("Loi cham cong")
+                        .build()
+        );
+        }
     }
 
     @Override

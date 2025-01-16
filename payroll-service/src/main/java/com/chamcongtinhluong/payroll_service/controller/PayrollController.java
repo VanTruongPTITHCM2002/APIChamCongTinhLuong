@@ -3,6 +3,7 @@ package com.chamcongtinhluong.payroll_service.controller;
 import com.chamcongtinhluong.payroll_service.dto.request.PayrollCaculate;
 import com.chamcongtinhluong.payroll_service.dto.request.PayrollRequest;
 import com.chamcongtinhluong.payroll_service.dto.request.PayrollRes;
+import com.chamcongtinhluong.payroll_service.dto.response.ApiResponse;
 import com.chamcongtinhluong.payroll_service.service.PayrollService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,16 @@ public class PayrollController {
     @GetMapping
     private ResponseEntity<?> getPayRolls(){
         return payrollService.getListSalary();
+    }
+
+    @GetMapping("/list")
+    private ResponseEntity<ApiResponse> getListSalary(){
+        return payrollService.getSalary();
+    }
+
+    @GetMapping("/list/detail")
+    private ResponseEntity<?> getDetailSalary(@RequestParam int month, @RequestParam int year){
+        return payrollService.getDetailSalary(month, year);
     }
 
     @GetMapping("getidemployee")

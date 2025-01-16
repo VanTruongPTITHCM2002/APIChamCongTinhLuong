@@ -1,6 +1,7 @@
 package com.chamcongtinhluong.attendence.service;
 
 
+import com.chamcongtinhluong.attendence.dto.request.AttendanceNewRequest;
 import com.chamcongtinhluong.attendence.dto.request.AttendanceRequest;
 import com.chamcongtinhluong.attendence.dto.request.IdEmployeeRequest;
 import org.springframework.http.ResponseEntity;
@@ -16,5 +17,6 @@ public interface AttendanceService {
     ResponseEntity<?>getAttendanceById(String idemployee);
     ResponseEntity<?>updateAttendanceByAdmin(AttendanceRequest attendanceRequest) throws ParseException;
     int countAttendanceByDate(Date date);
+    ResponseEntity<?>addAttendanceNew(AttendanceNewRequest attendanceNewRequest) throws ParseException;
     ResponseEntity<?>addAttendanceByAdmin(AttendanceRequest attendanceRequest) throws ParseException;
 }

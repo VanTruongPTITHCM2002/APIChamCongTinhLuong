@@ -1,5 +1,6 @@
 package com.chamcongtinhluong.attendence.controller;
 
+import com.chamcongtinhluong.attendence.dto.request.AttendanceNewRequest;
 import com.chamcongtinhluong.attendence.dto.request.AttendanceRequest;
 import com.chamcongtinhluong.attendence.dto.request.IdEmployeeRequest;
 import com.chamcongtinhluong.attendence.dto.response.AttendanceResponse;
@@ -60,5 +61,10 @@ public class AttendanceController {
     @PostMapping("/admin/add-attendance")
     private  ResponseEntity<?>addAttendanceByAdmin(@RequestBody AttendanceRequest attendanceRequest) throws ParseException{
         return attendanceService.addAttendanceByAdmin(attendanceRequest);
+    }
+
+    @PostMapping("/insert")
+    private ResponseEntity<?> insertAttendance(@RequestBody AttendanceNewRequest attendanceNewRequest) throws ParseException {
+        return attendanceService.addAttendanceNew(attendanceNewRequest);
     }
 }
